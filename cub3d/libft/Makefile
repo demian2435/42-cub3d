@@ -6,7 +6,7 @@
 #    By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/18 09:44:39 by dmalori           #+#    #+#              #
-#    Updated: 2021/02/02 10:35:13 by d2435            ###   ########.fr        #
+#    Updated: 2021/02/02 18:52:13 by d2435            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -66,6 +66,7 @@ SRCS		= 	ft_memset.c \
 				ft_lstmap.c \
 				ft_strncpy.c \
 				ft_strndup.c \
+				ft_strndupfill.c \
 				ft_iscontain.c \
 				ft_recalloc.c \
 				ft_get_next_line.c \

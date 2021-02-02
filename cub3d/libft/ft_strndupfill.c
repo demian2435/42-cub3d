@@ -1,30 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_recalloc.c                                      :+:      :+:    :+:   */
+/*   ft_strndupfill.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/19 10:36:53 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/02 17:05:02 by d2435            ###   ########.fr       */
+/*   Created: 2021/02/02 09:43:32 by d2435             #+#    #+#             */
+/*   Updated: 2021/02/02 18:52:45 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char					*ft_recalloc(char *line_old, ssize_t plus)
+char		*ft_strndupfill(const char *s, size_t n, char fill)
 {
-	char				*line_new;
-	int					i;
+	char	*dup;
+	char	*p;
 
-	i = 0;
-	if (!(line_new = ft_calloc(ft_strlen(line_old) + plus + 1, sizeof(char))))
+	if ((dup = malloc((n + 1) * sizeof(char))) == NULL)
 		return (NULL);
-	while (line_old[i])
+	p = dup;
+	while (n && *s)
 	{
-		line_new[i] = line_old[i];
-		i++;
+		*p++ = *s++;
+		n--;
 	}
-	free(line_old);
-	return (line_new);
+	while (n)
+	{
+		*p++ = fill;
+		n--;
+	}
+	*p = 0;
+	return (dup);
 }

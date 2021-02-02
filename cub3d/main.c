@@ -6,18 +6,12 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 18:38:52 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/02 15:35:25 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/02 19:52:16 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <fcntl.h>
 #include "libft/libft.h"
-
-void ft_exception(char *str)
-{
-	ft_printf("Error: %s\n", str);
-	exit(-1);
-}
 
 typedef struct s_cub
 {
@@ -31,11 +25,33 @@ typedef struct s_cub
 	int FLOOR_COLOR[3];
 	int CEILING_COLOR[3];
 	char **MAP;
-	int MAP_X;
-	int MAP_Y;
+	int MAP_WIDTH;
+	int MAP_HEIGHT;
 } t_cub;
 
-t_cub ft_initCub(t_cub *cub)
+void ft_freecub(t_cub *cub)
+{
+	free(cub->TEXTURE_NORTH);
+	cub->TEXTURE_NORTH = NULL;
+	free(cub->TEXTURE_SOUTH);
+	cub->TEXTURE_SOUTH = NULL;
+	free(cub->TEXTURE_WEST);
+	cub->TEXTURE_WEST = NULL;
+	free(cub->TEXTURE_EAST);
+	cub->TEXTURE_EAST = NULL;
+	free(cub->TEXTURE_SPRITE);
+	cub->TEXTURE_SPRITE = NULL;
+	while (*cub->MAP)
+		free(*cub->MAP++);
+}
+
+void ft_exception(char *str)
+{
+	ft_printf("Error: %s\n", str);
+	exit(-1);
+}
+
+void ft_initCub(t_cub *cub)
 {
 	cub->RESOLUTION_X = -1;
 	cub->RESOLUTION_Y = -1;
@@ -51,8 +67,55 @@ t_cub ft_initCub(t_cub *cub)
 	cub->CEILING_COLOR[1] = -1;
 	cub->CEILING_COLOR[2] = -1;
 	cub->MAP = NULL;
-	cub->MAP_X = -1;
-	cub->MAP_Y = -1;
+	cub->MAP_WIDTH = -1;
+	cub->MAP_HEIGHT = -1;
+}
+
+int ft_isSpaceNear(char **map, int x, int y)
+{
+	if (map[y][x + 1] == ' ')
+		return (0);
+	if (map[y][x - 1] == ' ')
+		return (0);
+	if (map[y + 1][x] == ' ')
+		return (0);
+	if (map[y - 1][x] == ' ')
+		return (0);
+	if (map[y + 1][x + 1] == ' ')
+		return (0);
+	if (map[y - 1][x + 1] == ' ')
+		return (0);
+	if (map[y + 1][x - 1] == ' ')
+		return (0);
+	if (map[y - 1][x - 1] == ' ')
+		return (0);
+	return (1);
+}
+
+int ft_controlMapBorder(t_cub cub)
+{
+	int x;
+	int y;
+
+	x = 0;
+	y = 0;
+	while (y < cub.MAP_HEIGHT)
+	{
+		x = 0;
+		while (x < cub.MAP_WIDTH)
+		{
+			if (cub.MAP[y][x] == '0' || cub.MAP[y][x] == '2' || cub.MAP[y][x] == 'N' || cub.MAP[y][x] == 'S' || cub.MAP[y][x] == 'W' || cub.MAP[y][x] == 'E')
+			{
+				if (x == 0 || y == 0 || y == cub.MAP_HEIGHT - 1 || x == cub.MAP_WIDTH - 1)
+					return (0);
+				if (ft_isSpaceNear(cub.MAP, x, y) == 0)
+					return (0);
+			}
+			x++;
+		}
+		y++;
+	}
+	return (1);
 }
 
 void ft_controlErrorCub(t_cub cub)
@@ -79,12 +142,12 @@ void ft_controlErrorCub(t_cub cub)
 		cub.CEILING_COLOR[1] < 0 || cub.CEILING_COLOR[1] > 255 ||
 		cub.CEILING_COLOR[2] < 0 || cub.CEILING_COLOR[2] > 255)
 		ft_exception("Ceiling color values");
-	if (cub.MAP_X < 3)
+	if (cub.MAP_WIDTH < 3)
 		ft_exception("Map width too small");
-	if (cub.MAP_Y < 3)
+	if (cub.MAP_HEIGHT < 3)
 		ft_exception("Map height too small");
-	if (ft_controlmapborder(cub.MAP) == 0)
-		ft_exception("Map border fail");
+	if (ft_controlMapBorder(cub) == 0)
+		ft_exception("Map border open");
 }
 
 int ft_isstartmap(char *str)
@@ -131,163 +194,161 @@ int ft_ismap(char *str)
 	return (0);
 }
 
-static void ft_parseFileCub_bis(int fd, t_cub *cub, char *line, t_list **list_map)
+static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 {
+	char *line;
 	int count;
 
 	count = 0;
-	if (ft_isstartmap(line))
+	while ((count = ft_get_next_line(fd, &line)) > 0)
 	{
-		if (*list_map)
-			ft_exception("Duplicated map");
-		*list_map = ft_lstnew(ft_strdup(line));
-		while (count = ft_get_next_line(fd, &line))
+		if (ft_isstartmap(line))
 		{
+			if (*list_map)
+				ft_exception("Duplicated map");
+			*list_map = ft_lstnew(ft_strdup(line));
+			while ((count = ft_get_next_line(fd, &line)) > 0)
+			{
+				if (ft_ismap(line))
+					ft_lstadd_back(&(*list_map), ft_lstnew(line));
+				else
+					return;
+			}
 			if (ft_ismap(line))
 				ft_lstadd_back(&(*list_map), ft_lstnew(line));
-			else
-				return (ft_parseFileCub_bis(fd, cub, line, list_map));
+			return;
 		}
-		if (ft_ismap(line))
-			ft_lstadd_back(&(*list_map), ft_lstnew(line));
-		return;
+		if (line[0] == 'R' && ft_isspace(line[1]))
+		{
+			if (cub->RESOLUTION_X != -1 && cub->RESOLUTION_Y != -1)
+				ft_exception("Duplicated resolution");
+			line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->RESOLUTION_X = ft_atoi(line);
+			while (ft_isdigit(*line))
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->RESOLUTION_Y = ft_atoi(line);
+		}
+		else if (line[0] == 'N' && line[1] == 'O' && ft_isspace(line[2]))
+		{
+			if (cub->TEXTURE_NORTH != NULL)
+				ft_exception("Duplicated north texture");
+			line += 2;
+			while (ft_isspace(*line))
+				line++;
+			cub->TEXTURE_NORTH = ft_strdup(line);
+		}
+		else if (*line == 'S' && *(line + 1) == 'O' && ft_isspace(*(line + 2)))
+		{
+			if (cub->TEXTURE_SOUTH != NULL)
+				ft_exception("Duplicated south texture");
+			line += 2;
+			while (ft_isspace(*line))
+				line++;
+			cub->TEXTURE_SOUTH = ft_strdup(line);
+		}
+		else if (*line == 'W' && *(line + 1) == 'E' && ft_isspace(*(line + 2)))
+		{
+			if (cub->TEXTURE_WEST != NULL)
+				ft_exception("Duplicated west texture");
+			line += 2;
+			while (ft_isspace(*line))
+				line++;
+			cub->TEXTURE_WEST = ft_strdup(line);
+		}
+		else if (*line == 'E' && *(line + 1) == 'A' && ft_isspace(*(line + 2)))
+		{
+			if (cub->TEXTURE_EAST != NULL)
+				ft_exception("Duplicated east texture");
+			line += 2;
+			while (ft_isspace(*line))
+				line++;
+			cub->TEXTURE_EAST = ft_strdup(line);
+		}
+		else if (*line == 'S' && ft_isspace(*(line + 1)))
+		{
+			if (cub->TEXTURE_SPRITE != NULL)
+				ft_exception("Duplicated sprite texture");
+			line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->TEXTURE_SPRITE = ft_strdup(line);
+		}
+		else if (*line == 'F' && ft_isspace(*(line + 1)))
+		{
+			if (cub->FLOOR_COLOR[0] != -1 && cub->FLOOR_COLOR[1] != -1 && cub->FLOOR_COLOR[2] != -1)
+				ft_exception("Duplicated floor color");
+			line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->FLOOR_COLOR[0] = ft_atoi(line);
+			while (ft_isdigit(*line))
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			if (*line != ',')
+				ft_exception("Parsing floor color");
+			else
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->FLOOR_COLOR[1] = ft_atoi(line);
+			while (ft_isdigit(*line))
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			if (*line != ',')
+				ft_exception("Parsing floor color");
+			else
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->FLOOR_COLOR[2] = ft_atoi(line);
+		}
+		else if (*line == 'C' && *(line + 1) == ' ')
+		{
+			if (cub->CEILING_COLOR[0] != -1 && cub->CEILING_COLOR[1] != -1 && cub->CEILING_COLOR[2] != -1)
+				ft_exception("Duplicated ceiling color");
+			line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->CEILING_COLOR[0] = ft_atoi(line);
+			while (ft_isdigit(*line))
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			if (*line != ',')
+				ft_exception("Parsing ceiling color");
+			else
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->CEILING_COLOR[1] = ft_atoi(line);
+			while (ft_isdigit(*line))
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			if (*line != ',')
+				ft_exception("Parsing ceiling color");
+			else
+				line++;
+			while (ft_isspace(*line))
+				line++;
+			cub->CEILING_COLOR[2] = ft_atoi(line);
+		}
+		else if (ft_ismap(line))
+			ft_exception("Wrong first map line");
+		else if (ft_strlen(line) > 0)
+			ft_exception("Fake line detected");
 	}
-	if (*line == 'R' && ft_isspace(*(line + 1)))
-	{
-		if (cub->RESOLUTION_X != -1 && cub->RESOLUTION_Y != -1)
-			ft_exception("Duplicated resolution");
-		line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->RESOLUTION_X = ft_atoi(line);
-		while (ft_isdigit(*line))
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->RESOLUTION_Y = ft_atoi(line);
-		return;
-	}
-	else if (*line == 'N' && *(line + 1) == 'O' && ft_isspace(*(line + 2)))
-	{
-		if (cub->TEXTURE_NORTH != NULL)
-			ft_exception("Duplicated north texture");
-		line += 2;
-		while (ft_isspace(*line))
-			line++;
-		cub->TEXTURE_NORTH = ft_strdup(line);
-		return;
-	}
-	else if (*line == 'S' && *(line + 1) == 'O' && ft_isspace(*(line + 2)))
-	{
-		if (cub->TEXTURE_SOUTH != NULL)
-			ft_exception("Duplicated south texture");
-		line += 2;
-		while (ft_isspace(*line))
-			line++;
-		cub->TEXTURE_SOUTH = ft_strdup(line);
-		return;
-	}
-	else if (*line == 'W' && *(line + 1) == 'E' && ft_isspace(*(line + 2)))
-	{
-		if (cub->TEXTURE_WEST != NULL)
-			ft_exception("Duplicated west texture");
-		line += 2;
-		while (ft_isspace(*line))
-			line++;
-		cub->TEXTURE_WEST = ft_strdup(line);
-		return;
-	}
-	else if (*line == 'E' && *(line + 1) == 'A' && ft_isspace(*(line + 2)))
-	{
-		if (cub->TEXTURE_EAST != NULL)
-			ft_exception("Duplicated east texture");
-		line += 2;
-		while (ft_isspace(*line))
-			line++;
-		cub->TEXTURE_EAST = ft_strdup(line);
-		return;
-	}
-	else if (*line == 'S' && ft_isspace(*(line + 1)))
-	{
-		if (cub->TEXTURE_SPRITE != NULL)
-			ft_exception("Duplicated sprite texture");
-		line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->TEXTURE_SPRITE = ft_strdup(line);
-		return;
-	}
-	else if (*line == 'F' && ft_isspace(*(line + 1)))
-	{
-		if (cub->FLOOR_COLOR[0] != -1 && cub->FLOOR_COLOR[1] != -1 && cub->FLOOR_COLOR[2] != -1)
-			ft_exception("Duplicated floor color");
-		line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->FLOOR_COLOR[0] = ft_atoi(line);
-		while (ft_isdigit(*line))
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		if (*line != ',')
-			ft_exception("Parsing floor color");
-		else
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->FLOOR_COLOR[1] = ft_atoi(line);
-		while (ft_isdigit(*line))
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		if (*line != ',')
-			ft_exception("Parsing floor color");
-		else
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->FLOOR_COLOR[2] = ft_atoi(line);
-		return;
-	}
-	else if (*line == 'C' && *(line + 1) == ' ')
-	{
-		if (cub->CEILING_COLOR[0] != -1 && cub->CEILING_COLOR[1] != -1 && cub->CEILING_COLOR[2] != -1)
-			ft_exception("Duplicated ceiling color");
-		line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->CEILING_COLOR[0] = ft_atoi(line);
-		while (ft_isdigit(*line))
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		if (*line != ',')
-			ft_exception("Parsing ceiling color");
-		else
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->CEILING_COLOR[1] = ft_atoi(line);
-		while (ft_isdigit(*line))
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		if (*line != ',')
-			ft_exception("Parsing ceiling color");
-		else
-			line++;
-		while (ft_isspace(*line))
-			line++;
-		cub->CEILING_COLOR[2] = ft_atoi(line);
-		return;
-	}
-	else if (ft_strlen(line) > 0)
-		ft_exception("Fake line detected");
 }
 
 int ft_mapmaxwidth(t_list *list_map)
 {
-	int max;
+	size_t max;
 
 	max = 0;
 	while (list_map)
@@ -296,38 +357,32 @@ int ft_mapmaxwidth(t_list *list_map)
 			max = ft_strlen(list_map->content);
 		list_map = list_map->next;
 	}
-	return (max);
+	return ((int)max);
 }
 
 void ft_parseFileCub(int fd, t_cub *cub)
 {
-	char *line;
-	int count;
 	t_list *list_map;
+	t_list *list_map_temp;
 	int i;
 
 	list_map = NULL;
-	while (count = ft_get_next_line(fd, &line))
-	{
-		if (count == -1)
-			ft_exception("File not valid");
-		ft_parseFileCub_bis(fd, cub, line, &list_map);
-	}
-	if (count == -1)
-		ft_exception("File not valid");
-	ft_parseFileCub_bis(fd, cub, line, &list_map);
-	cub->MAP_Y = ft_lstsize(list_map);
-	if ((cub->MAP = (char **)malloc((cub->MAP_Y + 1) * sizeof(char *))) == NULL)
-		ft_exception("Malloc fail during map creation");
-	cub->MAP_X = ft_mapmaxwidth(list_map);
+	ft_parseFileCub_bis(fd, cub, &list_map);
+	cub->MAP_HEIGHT = ft_lstsize(list_map);
+	if ((cub->MAP = (char **)malloc((cub->MAP_HEIGHT + 1) * sizeof(char *))) == NULL)
+		ft_exception("Malloc fail during map creation (step 1)");
+	cub->MAP_WIDTH = ft_mapmaxwidth(list_map);
 	i = 0;
+	list_map_temp = list_map;
 	while (list_map)
 	{
-		cub->MAP[i] = ft_strdup(list_map->content);
+		if((cub->MAP[i] = ft_strndupfill(list_map->content, cub->MAP_WIDTH ,' '))==NULL)
+			ft_exception("Malloc fail during map creation (step 2)");
 		list_map = list_map->next;
 		i++;
 	}
 	cub->MAP[i] = NULL;
+	ft_lstclear(&list_map_temp, free);
 	ft_controlErrorCub(*cub);
 }
 
@@ -341,7 +396,7 @@ void ft_printCub(t_cub cub)
 	ft_printf("TEXTURE_SPRITE: %s\n", cub.TEXTURE_SPRITE);
 	ft_printf("FLOOR_COLOR [R: %d, G: %d, B: %d]\n", cub.FLOOR_COLOR[0], cub.FLOOR_COLOR[1], cub.FLOOR_COLOR[2]);
 	ft_printf("CEILING_COLOR [R: %d, G: %d, B: %d]\n", cub.CEILING_COLOR[0], cub.CEILING_COLOR[1], cub.CEILING_COLOR[2]);
-	ft_printf("MAP_SIZE [X: %d, Y: %d]\n", cub.MAP_X, cub.MAP_Y);
+	ft_printf("MAP_SIZE [WIDTH: %d, HEIGHT: %d]\n", cub.MAP_WIDTH, cub.MAP_HEIGHT);
 	ft_printf("MAP:\n");
 	while (*cub.MAP)
 		ft_printf("--> %s\n", *cub.MAP++);
@@ -353,5 +408,12 @@ int main(void)
 	t_cub cub;
 	ft_initCub(&cub);
 	ft_parseFileCub(fd, &cub);
+	close(fd);
+
 	ft_printCub(cub);
+
+
+
+	/*FINE*/
+	ft_freecub(&cub);
 }

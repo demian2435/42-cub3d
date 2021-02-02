@@ -1,1 +1,18 @@
-gcc main.c -L./libft -lft && ./a.out
+#!/bin/bash
+
+gcc main.c -L./libft -lft
+
+if [ "$1" = -v ];
+then
+	echo "**START WITH VALGRIND CONTROL"
+	valgrind --leak-check=full \
+			--show-leak-kinds=all \
+			--track-origins=yes \
+			--verbose \
+			--verbose \
+			--log-file=./extra/valgrind-out.txt \
+			-s ./a.out && rm ./a.out
+	cat ./extra/valgrind-out.txt
+else
+	./a.out && rm ./a.out
+fi
