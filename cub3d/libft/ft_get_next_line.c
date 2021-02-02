@@ -1,16 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   ft_get_next_line.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/18 11:56:42 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/01 17:13:58 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/02 10:06:11 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "libft.h"
+
+static void					ft_clear(char *arr)
+{
+	int					i;
+
+	i = 0;
+	while (i < BUFFER_SIZE)
+		arr[i++] = 0;
+}
 
 static int	ft_read_static(char *arr, char **line, char *line_new, int size)
 {
@@ -49,7 +58,7 @@ static int	ft_return(int code, char *arr, char *line_new, char **line)
 	return (code);
 }
 
-int	get_next_line(int fd, char **line)
+int	ft_get_next_line(int fd, char **line)
 {
 	static char		arr[MAX_FILES][BUFFER_SIZE];
 	char			*line_new;

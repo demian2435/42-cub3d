@@ -1,25 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   ft_recalloc.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 10:36:53 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/01 17:14:49 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/02 10:04:46 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
-
-void					ft_clear(char *arr)
-{
-	int					i;
-
-	i = 0;
-	while (i < BUFFER_SIZE)
-		arr[i++] = 0;
-}
+#include "libft.h"
 
 char					*ft_recalloc(char *line_old, ssize_t plus)
 {

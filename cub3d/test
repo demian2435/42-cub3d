@@ -1,1 +1,1 @@
-gcc -DBUFFER_SIZE=16 main.c get_next_line/*.c libft/*.c && ./a.out
+gcc main.c -L./libft -lft && ./a.out

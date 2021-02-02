@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+         #
+#    By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/01/18 09:44:39 by dmalori           #+#    #+#              #
-#    Updated: 2021/01/18 09:44:48 by dmalori          ###   ########.fr        #
+#    Updated: 2021/02/02 10:35:13 by d2435            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,9 +53,9 @@ SRCS		= 	ft_memset.c \
 				ft_putchar_fd.c \
 				ft_putstr_fd.c \
 				ft_putendl_fd.c \
-				ft_putnbr_fd.c
-
-SRCS_BONUS	= 	ft_lstnew.c \
+				ft_putnbr_fd.c \
+				ft_isspace.c \
+				ft_lstnew.c \
 				ft_lstadd_front.c \
 				ft_lstsize.c \
 				ft_lstlast.c \
@@ -63,11 +63,42 @@ SRCS_BONUS	= 	ft_lstnew.c \
 				ft_lstdelone.c \
 				ft_lstclear.c \
 				ft_lstiter.c \
-				ft_lstmap.c
-
+				ft_lstmap.c \
+				ft_strncpy.c \
+				ft_strndup.c \
+				ft_iscontain.c \
+				ft_recalloc.c \
+				ft_get_next_line.c \
+				ft_atoi_abs.c \
+				ft_core_digit.c \
+				ft_core_minus.c \
+				ft_core_point.c \
+				ft_core_print.c \
+				ft_core_star.c \
+				ft_core_zero.c \
+				ft_initflags.c \
+				ft_isterminator.c \
+				ft_itoa_base_unsigned_long.c \
+				ft_itoa_base_unsigned.c \
+				ft_itoa_base.c \
+				ft_max.c \
+				ft_min.c \
+				ft_print_char.c \
+				ft_print_decimal_neg.c \
+				ft_print_decimal_unsigned.c \
+				ft_print_decimal.c \
+				ft_print_exa.c \
+				ft_print_percent.c \
+				ft_print_pointer_null.c \
+				ft_print_pointer.c \
+				ft_print_string.c \
+				ft_print_zero.c \
+				ft_printf.c \
+				ft_putlchar.c \
+				ft_putlstr.c \
+				ft_toupperstr.c
+				
 OBJS		= ${SRCS:.c=.o}
-
-OBJS_BONUS	= ${SRCS_BONUS:.c=.o}
 
 RM			= rm -f
 
@@ -80,16 +111,12 @@ $(NAME):	${OBJS}
 
 all:		${NAME}
 
-bonus:		${OBJS_BONUS} ${NAME}
-			${LIB} ${NAME} ${OBJS_BONUS}
-			${RAN} ${NAME}
-
 clean:
-			${RM} ${OBJS} ${OBJS_BONUS}
+			${RM} ${OBJS}
 
 fclean:		clean
 			${RM} ${NAME}
 
 re:			fclean all
 
-.PHONY:		all bonus clean fclean re
+.PHONY:		all clean fclean re

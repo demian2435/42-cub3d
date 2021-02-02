@@ -3,18 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 12:24:26 by dmalori           #+#    #+#             */
-/*   Updated: 2021/01/18 09:44:29 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/02 12:14:06 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
-
+# define MAX_FILES 4096
+# define BUFFER_SIZE 64
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdarg.h>
+
+typedef enum { FALSE, TRUE} BOOL;
 
 typedef struct		s_list
 {
@@ -22,6 +26,17 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
+typedef struct		s_flags
+{
+	int minus;
+	int size;
+	int terminator;
+	int point;
+	int zero;
+}					t_flags;
+
+int					ft_get_next_line(int fd, char **line);
+char				*ft_recalloc(char *line_old, ssize_t plus);
 int					ft_atoi(const char *nptr);
 void				ft_bzero(void *s, size_t n);
 void				*ft_calloc(size_t nelem, size_t elsize);
@@ -54,6 +69,7 @@ void				ft_putstr_fd(char *s, int fd);
 char				**ft_split(char const *s, char c);
 char				*ft_strchr(const char *s, int c);
 char				*ft_strdup(const char *s);
+char				*ft_strndup(const char *s, size_t n);
 char				*ft_strjoin(char const *s1, char const *s2);
 size_t				ft_strlcat(char *dest, const char *src, size_t size);
 size_t				ft_strlcpy(char *dest, const char *src, size_t size);
@@ -67,5 +83,36 @@ char				*ft_strtrim(char const *s1, char const *set);
 char				*ft_substr(char const *s, unsigned int start, size_t len);
 int					ft_tolower(int c);
 int					ft_toupper(int c);
+int					ft_isspace(int c);
+int					ft_iscontain(char c, char const *set);
+char				*ft_strncpy(char *dest, char *src, size_t n, size_t i);
+int					ft_atoi_abs(const char *nptr);
+int					ft_core_digit(char *str, t_flags *flags, va_list *args);
+int					ft_core_minus(char *str, t_flags *flags, va_list *args);
+int					ft_core_point(char *str, t_flags *flags, va_list *args);
+int					ft_core_print(char *str, t_flags *flags, va_list *args);
+int					ft_core_star(char *str, t_flags *flags, va_list *args);
+int					ft_core_zero(char *str, t_flags *flags, va_list *args);
+t_flags				ft_initflags(t_flags flags);
+int					ft_isterminator(int c);
+char				*ft_itoa_base_unsigned_long(size_t number, int base);
+char				*ft_itoa_base_unsigned(unsigned int number, int base);
+char				*ft_itoa_base(int number, int base);
+int					ft_max(int a, int b);
+int					ft_min(int a, int b);
+int					ft_print_char(t_flags *flags, int c);
+int					ft_print_decimal_neg(t_flags *flags, char *num);
+int					ft_print_decimal_unsigned(t_flags *flags, int n);
+int					ft_print_decimal(t_flags *flags, int n);
+int					ft_print_exa(t_flags *flags, size_t n, int u);
+int					ft_print_percent(t_flags *flags);
+int					ft_print_pointer_null(t_flags *flags);
+int					ft_print_pointer(t_flags *flags, size_t ptr);
+int					ft_print_string(t_flags *flags, char *str);
+int					ft_print_zero(t_flags *flags);
+int					ft_printf(const char *str, ...);
+int					ft_putlchar(char c);
+int					ft_putlstr(char *s, int len);
+char				*ft_toupperstr(char *str);
 
 #endif

@@ -3,39 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 12:00:30 by dmalori           #+#    #+#             */
-/*   Updated: 2021/01/18 09:44:26 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/02 09:44:48 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-static int		ft_iscontain(char c, char const *set)
-{
-	while (*set)
-		if (c == *set++)
-			return (1);
-	return (0);
-}
-
-static char		*ft_strndup(const char *s, size_t n)
-{
-	char		*dup;
-	char		*p;
-
-	if ((dup = malloc(n + 1)) == NULL)
-		return (NULL);
-	p = dup;
-	while (n)
-	{
-		*p++ = *s++;
-		n--;
-	}
-	*p = 0;
-	return (dup);
-}
 
 char			*ft_strtrim(char const *s1, char const *set)
 {

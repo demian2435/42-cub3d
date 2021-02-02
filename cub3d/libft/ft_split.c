@@ -3,25 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:32:33 by dmalori           #+#    #+#             */
-/*   Updated: 2021/01/18 10:15:11 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/02 09:40:37 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-static char		*ft_strncpy(char *dest, char *src, size_t n, size_t i)
-{
-	while (src[i] && i < n)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
 
 static char		*ft_next(char **a, int *size, char c, int i)
 {
