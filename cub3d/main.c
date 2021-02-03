@@ -10,8 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <math.h>
 #include <fcntl.h>
-#include "libft/libft.h"
+#include "mlx.h"
+#include "libft.h"
 
 typedef struct s_cub
 {
@@ -143,7 +145,7 @@ int ft_controlMapBorder(t_cub *cub)
 void ft_controlErrorCub(t_cub *cub)
 {
 	int ret;
-	
+
 	if (cub->RESOLUTION_X <= 0)
 		ft_exception("Resolution X not valid");
 	if (cub->RESOLUTION_Y <= 0)
@@ -436,18 +438,160 @@ void ft_printCub(t_cub cub)
 		ft_printf("--> %s\n", *cub.MAP++);
 }
 
+typedef struct s_img_data
+{
+	void *img;
+	char *addr;
+	int bits_per_pixel;
+	int line_length;
+	int endian;
+} t_img_data;
+
+int ft_create_color(int red, int green, int blue, int alpha, t_img_data img, void *mlx)
+{
+	int color;
+
+	if (img.endian == 0)
+		color = (alpha << 24 | red << 16 | green << 8 | blue);
+	else if (img.endian == 1)
+		color = (red << 24 | green << 16 | blue << 8 | alpha);
+	/*another type of pixel another type of mask*/
+	if (img.bits_per_pixel != 32)
+		color = mlx_get_color_value(mlx, color);
+	return (color);
+}
+
+void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_img_data img)
+{
+	int offset = (y * img.line_length + x * (img.bits_per_pixel / 8));
+
+	if (img.endian == 1) //ARGB
+	{
+		img.addr[offset + 0] = a;
+		img.addr[offset + 1] = r;
+		img.addr[offset + 2] = g;
+		img.addr[offset + 3] = b;
+	}
+	else if (img.endian == 0) //BGRA
+	{
+		img.addr[offset + 0] = b;
+		img.addr[offset + 1] = g;
+		img.addr[offset + 2] = r;
+		img.addr[offset + 3] = a;
+	}
+}
+
+typedef struct  s_vars {
+    void        *mlx;
+    void        *win;
+}               t_vars;
+
+int             key_hook(int keycode, t_vars *vars)
+{
+    //ft_printf("keycode: %d\n", keycode);
+	//ESC 65307
+	if (keycode == 65307)
+	{
+		ft_printf("Good bye my little friend..\n");
+		exit(0);
+	}
+	//A 97
+	else if (keycode == 97)
+	{
+		ft_printf("LEFT\n");
+	}
+	//D 100
+	else if (keycode == 100)
+	{
+		ft_printf("RIGHT\n");
+	}
+	//W 119
+	else if (keycode == 119)
+	{
+		ft_printf("UP\n");
+	}
+	//S 115
+	else if (keycode == 115)
+	{
+		ft_printf("DOWN\n");
+	}
+	//<-- 65361 
+	else if (keycode == 65361)
+	{
+		ft_printf("TURN LEFT\n");
+	}
+	//--> 65363
+	else if (keycode == 65363)
+	{
+		ft_printf("TURN RIGHT\n");
+	}
+}
+
+void screen(t_cub *cub, void *mlx)
+{
+	t_vars vars;
+	t_img_data img;
+
+	/* WINDOW */
+	vars.mlx = mlx;
+	vars.win = mlx_new_window(mlx, cub->RESOLUTION_X, cub->RESOLUTION_Y, "Cub3D D2435");
+
+	img.img = mlx_new_image(mlx, cub->RESOLUTION_X, cub->RESOLUTION_Y);
+
+	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+
+	/*print sky*/
+	for (int y = 0; y < cub->RESOLUTION_Y / 2; ++y)
+	{
+		for (int x = 0; x < cub->RESOLUTION_X; ++x)
+		{
+			ft_print_pixel(x, y, cub->CEILING_COLOR[0], cub->CEILING_COLOR[1], cub->CEILING_COLOR[2], 255, img);
+		}
+	}
+	/*print floor*/
+	for (int y = cub->RESOLUTION_Y / 2; y < cub->RESOLUTION_Y; ++y)
+	{
+		for (int x = 0; x < cub->RESOLUTION_X; ++x)
+		{
+			ft_print_pixel(x, y, cub->FLOOR_COLOR[0], cub->FLOOR_COLOR[1], cub->FLOOR_COLOR[2], 255, img);
+		}
+	}
+
+	mlx_put_image_to_window(mlx, vars.win, img.img, 0, 0);
+	mlx_destroy_image(mlx, img.img);
+
+	//mlx_hook(vars.win, 2, 1L<<0, close, &vars);
+	mlx_key_hook(vars.win, key_hook, &vars);
+}
+
 int main(int argc, char **argv)
 {
+
+	t_cub cub;
+	void *mlx;
+	int win_x;
+	int win_y;
+
 	if (argc == 1)
 		ft_exception("No map send");
+	else if (argc > 3)
+		ft_exception("Too many arguments");
+
+	/* PARSING MAP */
 	int fd = open(argv[1], O_RDONLY);
-	t_cub cub;
 	ft_initCub(&cub);
 	ft_parseFileCub(fd, &cub);
 	close(fd);
+	//ft_printCub(cub);
 
-	ft_printCub(cub);
-
+	mlx = mlx_init();
+	if (!mlx)
+		ft_exception("Mlx failed start");
+	mlx_get_screen_size(mlx, &win_x, &win_y);
+	if (cub.RESOLUTION_X > win_x || cub.RESOLUTION_Y > win_y)
+		ft_exception("Resolution not supported");
+	screen(&cub, mlx);
+	mlx_loop(mlx);
 	/*FINE*/
 	ft_freecub(&cub);
 }

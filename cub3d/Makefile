@@ -1,38 +1,65 @@
-# gcc .c libft/.c get_next_line/*.c -L minilibx_opengl -l mlx -framework OpenGL -framework AppKit
+OS			= $(shell uname)
 
-NAME		= cub3D
-MLX			= -Lminilibx/ -lmlx -framework OPENGL -framework Appkit
-LIBFT		= -Llibft -lft
+NAME		= Cub3D
+
+MAP			= ./maps/map.cub
+
+CC			= gcc
+
+OPT			= -O3
+
+FLAGS		= -Wall -Wextra -Werror
+
 SRCS		= main.c
-CFLAGS		= -Wall -Wextra -Werror -c
-CC			= gcc ${CFLAGS}
-RM			= rm -f
+
 OBJS		= ${SRCS:.c=.o}
 
-%.o:		%.c
-			${CC} ${CFLAGS} $<
+ifeq ($(OS), Linux)
+	MLX_DIR	= minilibx-linux
+	MLX_LNK	= -L ${MLX_DIR} -lmlx -lXext -lX11 -lbsd
+else
+	MLX_DIR	= minilibx-opengl
+	MLX_LNK	= -L ${MLX_DIR} -lmlx -framework OpenGL -framework AppKit 
+endif
 
-all: libft minilibx ${NAME}
+FT_DIR = libft
+FT_LNK = -L ${FT_DIR} -lft
 
-libft:
-	make -C libft/
+INC = -I $(FT_DIR) -I $(MLX_DIR)
 
-minilibx:
-	make -C minilibx/
+.c.o:
+	${CC} ${CFLAGS} -c $< -o ${<:.c=.o} ${INC}
 
-${NAME}: ${OBJS}
-	$(CC) ${LIBFT} ${MLX} -o ${NAME} ${OBJS}  
+${NAME}: ${OBJS} ft mlx
+		${CC} ${OPT} ${CFLAGS} ${INC} ${OBJS} ${FT_LNK} ${MLX_LNK} -o ${NAME}
+
+mlx:
+	make -C ${MLX_DIR}
+
+ft:
+	make -C ${FT_DIR}
+
+all: ${NAME}
 
 clean:
-			${RM} ${OBJS}
-			make -C libft/ clean
-			make -C minilibx/ clean
+	rm -f ${OBJS}
 
-fclean:		clean
-			${RM} ${NAME}
-			make -C libft/ fclean
-			make -C minilibx/ clean
+fclean: clean
+	make fclean -C ${FT_DIR}
+	make clean -C ${MLX_DIR}
+	rm -f ${NAME}
 
-re:			fclean all
+re: fclean all
 
-.PHONY:		all clean fclean re libft minilibx
+run: ${NAME}
+		./${NAME} ${MAP}
+
+v: ${NAME}
+	valgrind --leak-check=full \
+	--show-leak-kinds=all \
+	--track-origins=yes \
+	--verbose \
+	--log-file=./extra/valgrind-out.txt \
+	./${NAME} ${MAP} && cat ./extra/valgrind-out.txt
+
+.PHONY: all clean fclean re mlx ft run v
