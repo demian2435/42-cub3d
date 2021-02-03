@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 18:38:52 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/02 19:52:16 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/03 11:14:21 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,15 @@ typedef struct s_cub
 	char **MAP;
 	int MAP_WIDTH;
 	int MAP_HEIGHT;
+	int START_DIR;
+	int START_X;
+	int START_Y;
 } t_cub;
 
 void ft_freecub(t_cub *cub)
 {
+	int i;
+
 	free(cub->TEXTURE_NORTH);
 	cub->TEXTURE_NORTH = NULL;
 	free(cub->TEXTURE_SOUTH);
@@ -41,8 +46,10 @@ void ft_freecub(t_cub *cub)
 	cub->TEXTURE_EAST = NULL;
 	free(cub->TEXTURE_SPRITE);
 	cub->TEXTURE_SPRITE = NULL;
-	while (*cub->MAP)
-		free(*cub->MAP++);
+	i = 0;
+	while (cub->MAP[i])
+		free(cub->MAP[i++]);
+	free(cub->MAP);
 }
 
 void ft_exception(char *str)
@@ -69,85 +76,107 @@ void ft_initCub(t_cub *cub)
 	cub->MAP = NULL;
 	cub->MAP_WIDTH = -1;
 	cub->MAP_HEIGHT = -1;
+	cub->START_DIR = 'X';
+	cub->START_X = -1;
+	cub->START_Y = -1;
 }
 
 int ft_isSpaceNear(char **map, int x, int y)
 {
 	if (map[y][x + 1] == ' ')
-		return (0);
+		return (1);
 	if (map[y][x - 1] == ' ')
-		return (0);
+		return (1);
 	if (map[y + 1][x] == ' ')
-		return (0);
+		return (1);
 	if (map[y - 1][x] == ' ')
-		return (0);
+		return (1);
 	if (map[y + 1][x + 1] == ' ')
-		return (0);
+		return (1);
 	if (map[y - 1][x + 1] == ' ')
-		return (0);
+		return (1);
 	if (map[y + 1][x - 1] == ' ')
-		return (0);
+		return (1);
 	if (map[y - 1][x - 1] == ' ')
-		return (0);
-	return (1);
+		return (1);
+	return (0);
 }
 
-int ft_controlMapBorder(t_cub cub)
+int ft_controlMapBorder(t_cub *cub)
 {
 	int x;
 	int y;
+	int count;
 
-	x = 0;
+	count = 0;
 	y = 0;
-	while (y < cub.MAP_HEIGHT)
+	while (y < cub->MAP_HEIGHT)
 	{
 		x = 0;
-		while (x < cub.MAP_WIDTH)
+		while (x < cub->MAP_WIDTH)
 		{
-			if (cub.MAP[y][x] == '0' || cub.MAP[y][x] == '2' || cub.MAP[y][x] == 'N' || cub.MAP[y][x] == 'S' || cub.MAP[y][x] == 'W' || cub.MAP[y][x] == 'E')
+			if (cub->MAP[y][x] == '0' || cub->MAP[y][x] == '2' || cub->MAP[y][x] == 'N' || cub->MAP[y][x] == 'S' || cub->MAP[y][x] == 'W' || cub->MAP[y][x] == 'E')
 			{
-				if (x == 0 || y == 0 || y == cub.MAP_HEIGHT - 1 || x == cub.MAP_WIDTH - 1)
+				if (x == 0 || y == 0 || y == cub->MAP_HEIGHT - 1 || x == cub->MAP_WIDTH - 1)
 					return (0);
-				if (ft_isSpaceNear(cub.MAP, x, y) == 0)
+				if (ft_isSpaceNear(cub->MAP, x, y))
 					return (0);
+				if (ft_isalpha(cub->MAP[y][x]))
+				{
+					count++;
+					cub->START_DIR = cub->MAP[y][x];
+					cub->START_X = x;
+					cub->START_Y = y;
+				}
 			}
 			x++;
 		}
 		y++;
 	}
+	if (count > 1)
+		return (-2);
+	else if (count == 0)
+		return (-1);
 	return (1);
 }
 
-void ft_controlErrorCub(t_cub cub)
+void ft_controlErrorCub(t_cub *cub)
 {
-	if (cub.RESOLUTION_X <= 0)
+	int ret;
+	
+	if (cub->RESOLUTION_X <= 0)
 		ft_exception("Resolution X not valid");
-	if (cub.RESOLUTION_Y <= 0)
+	if (cub->RESOLUTION_Y <= 0)
 		ft_exception("Resolution Y not valid");
-	if (cub.TEXTURE_NORTH == NULL)
+	if (cub->TEXTURE_NORTH == NULL)
 		ft_exception("North texture NULL");
-	if (cub.TEXTURE_SOUTH == NULL)
+	if (cub->TEXTURE_SOUTH == NULL)
 		ft_exception("South texture NULL");
-	if (cub.TEXTURE_WEST == NULL)
+	if (cub->TEXTURE_WEST == NULL)
 		ft_exception("West texture NULL");
-	if (cub.TEXTURE_EAST == NULL)
+	if (cub->TEXTURE_EAST == NULL)
 		ft_exception("East texture NULL");
-	if (cub.TEXTURE_SPRITE == NULL)
+	if (cub->TEXTURE_SPRITE == NULL)
 		ft_exception("Sprite texture NULL");
-	if (cub.FLOOR_COLOR[0] < 0 || cub.FLOOR_COLOR[0] > 255 ||
-		cub.FLOOR_COLOR[1] < 0 || cub.FLOOR_COLOR[1] > 255 ||
-		cub.FLOOR_COLOR[2] < 0 || cub.FLOOR_COLOR[2] > 255)
+	if (cub->FLOOR_COLOR[0] < 0 || cub->FLOOR_COLOR[0] > 255 ||
+		cub->FLOOR_COLOR[1] < 0 || cub->FLOOR_COLOR[1] > 255 ||
+		cub->FLOOR_COLOR[2] < 0 || cub->FLOOR_COLOR[2] > 255)
 		ft_exception("Floor color values");
-	if (cub.CEILING_COLOR[0] < 0 || cub.CEILING_COLOR[0] > 255 ||
-		cub.CEILING_COLOR[1] < 0 || cub.CEILING_COLOR[1] > 255 ||
-		cub.CEILING_COLOR[2] < 0 || cub.CEILING_COLOR[2] > 255)
+	if (cub->CEILING_COLOR[0] < 0 || cub->CEILING_COLOR[0] > 255 ||
+		cub->CEILING_COLOR[1] < 0 || cub->CEILING_COLOR[1] > 255 ||
+		cub->CEILING_COLOR[2] < 0 || cub->CEILING_COLOR[2] > 255)
 		ft_exception("Ceiling color values");
-	if (cub.MAP_WIDTH < 3)
+	if (cub->MAP_WIDTH < 3)
 		ft_exception("Map width too small");
-	if (cub.MAP_HEIGHT < 3)
+	if (cub->MAP_HEIGHT < 3)
 		ft_exception("Map height too small");
-	if (ft_controlMapBorder(cub) == 0)
+	ret = ft_controlMapBorder(cub);
+	if (ret == 0)
 		ft_exception("Map border open");
+	else if (ret == -2)
+		ft_exception("Multyplayer not allowed");
+	else if (ret == -1)
+		ft_exception("No player spawn point");
 }
 
 int ft_isstartmap(char *str)
@@ -197,26 +226,28 @@ int ft_ismap(char *str)
 static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 {
 	char *line;
+	char *p_line;
 	int count;
 
 	count = 0;
 	while ((count = ft_get_next_line(fd, &line)) > 0)
 	{
+		p_line = line;
 		if (ft_isstartmap(line))
 		{
 			if (*list_map)
 				ft_exception("Duplicated map");
-			*list_map = ft_lstnew(ft_strdup(line));
+			*list_map = ft_lstnew(line);
 			while ((count = ft_get_next_line(fd, &line)) > 0)
 			{
 				if (ft_ismap(line))
 					ft_lstadd_back(&(*list_map), ft_lstnew(line));
 				else
-					return;
+					break;
 			}
 			if (ft_ismap(line))
 				ft_lstadd_back(&(*list_map), ft_lstnew(line));
-			return;
+			break;
 		}
 		if (line[0] == 'R' && ft_isspace(line[1]))
 		{
@@ -343,7 +374,9 @@ static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 			ft_exception("Wrong first map line");
 		else if (ft_strlen(line) > 0)
 			ft_exception("Fake line detected");
+		free(p_line);
 	}
+	free(line);
 }
 
 int ft_mapmaxwidth(t_list *list_map)
@@ -376,14 +409,14 @@ void ft_parseFileCub(int fd, t_cub *cub)
 	list_map_temp = list_map;
 	while (list_map)
 	{
-		if((cub->MAP[i] = ft_strndupfill(list_map->content, cub->MAP_WIDTH ,' '))==NULL)
+		if ((cub->MAP[i] = ft_strndupfill(list_map->content, cub->MAP_WIDTH, ' ')) == NULL)
 			ft_exception("Malloc fail during map creation (step 2)");
 		list_map = list_map->next;
 		i++;
 	}
 	cub->MAP[i] = NULL;
 	ft_lstclear(&list_map_temp, free);
-	ft_controlErrorCub(*cub);
+	ft_controlErrorCub(cub);
 }
 
 void ft_printCub(t_cub cub)
@@ -397,22 +430,23 @@ void ft_printCub(t_cub cub)
 	ft_printf("FLOOR_COLOR [R: %d, G: %d, B: %d]\n", cub.FLOOR_COLOR[0], cub.FLOOR_COLOR[1], cub.FLOOR_COLOR[2]);
 	ft_printf("CEILING_COLOR [R: %d, G: %d, B: %d]\n", cub.CEILING_COLOR[0], cub.CEILING_COLOR[1], cub.CEILING_COLOR[2]);
 	ft_printf("MAP_SIZE [WIDTH: %d, HEIGHT: %d]\n", cub.MAP_WIDTH, cub.MAP_HEIGHT);
+	ft_printf("START PLAYER [X: %d, Y: %d, DIR: %c]\n", cub.START_X, cub.START_Y, cub.START_DIR);
 	ft_printf("MAP:\n");
 	while (*cub.MAP)
 		ft_printf("--> %s\n", *cub.MAP++);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-	int fd = open("map.cub", O_RDONLY);
+	if (argc == 1)
+		ft_exception("No map send");
+	int fd = open(argv[1], O_RDONLY);
 	t_cub cub;
 	ft_initCub(&cub);
 	ft_parseFileCub(fd, &cub);
 	close(fd);
 
 	ft_printCub(cub);
-
-
 
 	/*FINE*/
 	ft_freecub(&cub);

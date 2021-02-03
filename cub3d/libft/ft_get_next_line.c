@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/18 11:56:42 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/02 17:13:59 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/03 10:28:40 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int	ft_return(int code, char *arr, char *line_new, char **line)
 	if (code == -1)
 		free(line_new);
 	if (code == 0 || code == 1)
-		*line = ft_recalloc(line_new, 0);
+		*line = line_new;
 	return (code);
 }
 

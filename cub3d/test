@@ -11,8 +11,8 @@ then
 			--verbose \
 			--verbose \
 			--log-file=./extra/valgrind-out.txt \
-			-s ./a.out && rm ./a.out
+			-s ./a.out "./map.cub"  && rm ./a.out
 	cat ./extra/valgrind-out.txt
 else
-	./a.out && rm ./a.out
+	./a.out "./map.cub" && rm ./a.out
 fi
