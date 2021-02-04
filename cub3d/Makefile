@@ -18,8 +18,8 @@ ifeq ($(OS), Linux)
 	MLX_DIR	= minilibx-linux
 	MLX_LNK	= -L ${MLX_DIR} -lmlx -lXext -lX11 -lbsd
 else
-	MLX_DIR	= minilibx-opengl
-	MLX_LNK	= -L ${MLX_DIR} -lmlx -framework OpenGL -framework AppKit 
+	MLX_DIR	= minilibx-mac
+	MLX_LNK	= -L ${MLX_DIR} -lmlx -framework OpenGL -framework AppKit
 endif
 
 FT_DIR = libft
@@ -35,6 +35,7 @@ ${NAME}: ${OBJS} ft mlx
 
 mlx:
 	make -C ${MLX_DIR}
+	mv ${MLX_DIR}/libmlx.dylib .
 
 ft:
 	make -C ${FT_DIR}
@@ -48,6 +49,7 @@ fclean: clean
 	make fclean -C ${FT_DIR}
 	make clean -C ${MLX_DIR}
 	rm -f ${NAME}
+	rm -f libmlx.dylib
 
 re: fclean all
 

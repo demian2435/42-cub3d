@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 18:38:52 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/03 11:14:21 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/04 19:12:41 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,72 +15,79 @@
 #include "mlx.h"
 #include "libft.h"
 
+
 typedef struct s_cub
 {
-	int RESOLUTION_X;
-	int RESOLUTION_Y;
-	char *TEXTURE_NORTH;
-	char *TEXTURE_SOUTH;
-	char *TEXTURE_WEST;
-	char *TEXTURE_EAST;
-	char *TEXTURE_SPRITE;
-	int FLOOR_COLOR[3];
-	int CEILING_COLOR[3];
-	char **MAP;
-	int MAP_WIDTH;
-	int MAP_HEIGHT;
-	int START_DIR;
-	int START_X;
-	int START_Y;
+	int res_x;
+	int res_y;
+	char *txt_N;
+	char *txt_S;
+	char *txt_W;
+	char *txt_E;
+	char *txt_SPR;
+	int f_rgb[3];
+	int c_rgb[3];
+	char **map;
+	int map_W;
+	int map_H;
 } t_cub;
+
+typedef struct s_img_data
+{
+	void *img;
+	char *addr;
+	int bpp;
+	int line_len;
+	int endian;
+} t_img_data;
+
+typedef struct s_mlx_vars
+{
+	void *mlx;
+	void *win;
+} t_mlx_vars;
+
+typedef struct s_player
+{
+	double pos_x;
+	double pos_y;
+	double dir_x;
+	double dir_y;
+	double plane_x;
+	double plane_y;
+	char move;
+} t_player;
+
+typedef struct s_system
+{
+	t_cub cub;
+	t_img_data img;
+	t_mlx_vars mlx_vars;
+	t_player player;
+
+} t_system;
+
+void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_system *sys);
 
 void ft_freecub(t_cub *cub)
 {
 	int i;
 
-	free(cub->TEXTURE_NORTH);
-	cub->TEXTURE_NORTH = NULL;
-	free(cub->TEXTURE_SOUTH);
-	cub->TEXTURE_SOUTH = NULL;
-	free(cub->TEXTURE_WEST);
-	cub->TEXTURE_WEST = NULL;
-	free(cub->TEXTURE_EAST);
-	cub->TEXTURE_EAST = NULL;
-	free(cub->TEXTURE_SPRITE);
-	cub->TEXTURE_SPRITE = NULL;
+	free(cub->txt_N);
+	free(cub->txt_S);
+	free(cub->txt_W);
+	free(cub->txt_E);
+	free(cub->txt_SPR);
 	i = 0;
-	while (cub->MAP[i])
-		free(cub->MAP[i++]);
-	free(cub->MAP);
+	while (cub->map[i])
+		free(cub->map[i++]);
+	free(cub->map);
 }
 
 void ft_exception(char *str)
 {
 	ft_printf("Error: %s\n", str);
 	exit(-1);
-}
-
-void ft_initCub(t_cub *cub)
-{
-	cub->RESOLUTION_X = -1;
-	cub->RESOLUTION_Y = -1;
-	cub->TEXTURE_NORTH = NULL;
-	cub->TEXTURE_SOUTH = NULL;
-	cub->TEXTURE_WEST = NULL;
-	cub->TEXTURE_EAST = NULL;
-	cub->TEXTURE_SPRITE = NULL;
-	cub->FLOOR_COLOR[0] = -1;
-	cub->FLOOR_COLOR[1] = -1;
-	cub->FLOOR_COLOR[2] = -1;
-	cub->CEILING_COLOR[0] = -1;
-	cub->CEILING_COLOR[1] = -1;
-	cub->CEILING_COLOR[2] = -1;
-	cub->MAP = NULL;
-	cub->MAP_WIDTH = -1;
-	cub->MAP_HEIGHT = -1;
-	cub->START_DIR = 'X';
-	cub->START_X = -1;
-	cub->START_Y = -1;
 }
 
 int ft_isSpaceNear(char **map, int x, int y)
@@ -104,7 +111,7 @@ int ft_isSpaceNear(char **map, int x, int y)
 	return (0);
 }
 
-int ft_controlMapBorder(t_cub *cub)
+int ft_controlMapBorder(t_system *sys)
 {
 	int x;
 	int y;
@@ -112,23 +119,48 @@ int ft_controlMapBorder(t_cub *cub)
 
 	count = 0;
 	y = 0;
-	while (y < cub->MAP_HEIGHT)
+	while (y < sys->cub.map_H)
 	{
 		x = 0;
-		while (x < cub->MAP_WIDTH)
+		while (x < sys->cub.map_W)
 		{
-			if (cub->MAP[y][x] == '0' || cub->MAP[y][x] == '2' || cub->MAP[y][x] == 'N' || cub->MAP[y][x] == 'S' || cub->MAP[y][x] == 'W' || cub->MAP[y][x] == 'E')
+			if (sys->cub.map[y][x] == '0' || sys->cub.map[y][x] == '2' || ft_isalpha(sys->cub.map[y][x]))
 			{
-				if (x == 0 || y == 0 || y == cub->MAP_HEIGHT - 1 || x == cub->MAP_WIDTH - 1)
+				if (x == 0 || y == 0 || y == sys->cub.map_H - 1 || x == sys->cub.map_W - 1)
 					return (0);
-				if (ft_isSpaceNear(cub->MAP, x, y))
+				if (ft_isSpaceNear(sys->cub.map, x, y))
 					return (0);
-				if (ft_isalpha(cub->MAP[y][x]))
+				if (sys->cub.map[y][x] == 'N')
 				{
 					count++;
-					cub->START_DIR = cub->MAP[y][x];
-					cub->START_X = x;
-					cub->START_Y = y;
+					sys->player.pos_x = x;
+					sys->player.pos_y = y;
+					sys->player.dir_x = 0;
+					sys->player.dir_y = 1;
+				}
+				else if (sys->cub.map[y][x] == 'S')
+				{
+					count++;
+					sys->player.pos_x = x;
+					sys->player.pos_y = y;
+					sys->player.dir_x = 0;
+					sys->player.dir_y = -1;
+				}
+				else if (sys->cub.map[y][x] == 'W')
+				{
+					count++;
+					sys->player.pos_x = x;
+					sys->player.pos_y = y;
+					sys->player.dir_x = -1;
+					sys->player.dir_y = 0;
+				}
+				else if (sys->cub.map[y][x] == 'E')
+				{
+					count++;
+					sys->player.pos_x = x;
+					sys->player.pos_y = y;
+					sys->player.dir_x = 1;
+					sys->player.dir_y = 0;
 				}
 			}
 			x++;
@@ -142,37 +174,37 @@ int ft_controlMapBorder(t_cub *cub)
 	return (1);
 }
 
-void ft_controlErrorCub(t_cub *cub)
+void ft_controlError(t_system *sys)
 {
 	int ret;
 
-	if (cub->RESOLUTION_X <= 0)
+	if (sys->cub.res_x <= 0)
 		ft_exception("Resolution X not valid");
-	if (cub->RESOLUTION_Y <= 0)
+	if (sys->cub.res_y <= 0)
 		ft_exception("Resolution Y not valid");
-	if (cub->TEXTURE_NORTH == NULL)
+	if (sys->cub.txt_N == NULL)
 		ft_exception("North texture NULL");
-	if (cub->TEXTURE_SOUTH == NULL)
+	if (sys->cub.txt_S == NULL)
 		ft_exception("South texture NULL");
-	if (cub->TEXTURE_WEST == NULL)
+	if (sys->cub.txt_W == NULL)
 		ft_exception("West texture NULL");
-	if (cub->TEXTURE_EAST == NULL)
+	if (sys->cub.txt_E == NULL)
 		ft_exception("East texture NULL");
-	if (cub->TEXTURE_SPRITE == NULL)
+	if (sys->cub.txt_SPR == NULL)
 		ft_exception("Sprite texture NULL");
-	if (cub->FLOOR_COLOR[0] < 0 || cub->FLOOR_COLOR[0] > 255 ||
-		cub->FLOOR_COLOR[1] < 0 || cub->FLOOR_COLOR[1] > 255 ||
-		cub->FLOOR_COLOR[2] < 0 || cub->FLOOR_COLOR[2] > 255)
+	if (sys->cub.f_rgb[0] < 0 || sys->cub.f_rgb[0] > 255 ||
+		sys->cub.f_rgb[1] < 0 || sys->cub.f_rgb[1] > 255 ||
+		sys->cub.f_rgb[2] < 0 || sys->cub.f_rgb[2] > 255)
 		ft_exception("Floor color values");
-	if (cub->CEILING_COLOR[0] < 0 || cub->CEILING_COLOR[0] > 255 ||
-		cub->CEILING_COLOR[1] < 0 || cub->CEILING_COLOR[1] > 255 ||
-		cub->CEILING_COLOR[2] < 0 || cub->CEILING_COLOR[2] > 255)
+	if (sys->cub.c_rgb[0] < 0 || sys->cub.c_rgb[0] > 255 ||
+		sys->cub.c_rgb[1] < 0 || sys->cub.c_rgb[1] > 255 ||
+		sys->cub.c_rgb[2] < 0 || sys->cub.c_rgb[2] > 255)
 		ft_exception("Ceiling color values");
-	if (cub->MAP_WIDTH < 3)
+	if (sys->cub.map_W < 3)
 		ft_exception("Map width too small");
-	if (cub->MAP_HEIGHT < 3)
+	if (sys->cub.map_H < 3)
 		ft_exception("Map height too small");
-	ret = ft_controlMapBorder(cub);
+	ret = ft_controlMapBorder(sys);
 	if (ret == 0)
 		ft_exception("Map border open");
 	else if (ret == -2)
@@ -253,71 +285,71 @@ static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 		}
 		if (line[0] == 'R' && ft_isspace(line[1]))
 		{
-			if (cub->RESOLUTION_X != -1 && cub->RESOLUTION_Y != -1)
+			if (cub->res_x != -1 && cub->res_y != -1)
 				ft_exception("Duplicated resolution");
 			line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->RESOLUTION_X = ft_atoi(line);
+			cub->res_x = ft_atoi(line);
 			while (ft_isdigit(*line))
 				line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->RESOLUTION_Y = ft_atoi(line);
+			cub->res_y = ft_atoi(line);
 		}
 		else if (line[0] == 'N' && line[1] == 'O' && ft_isspace(line[2]))
 		{
-			if (cub->TEXTURE_NORTH != NULL)
+			if (cub->txt_N != NULL)
 				ft_exception("Duplicated north texture");
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
-			cub->TEXTURE_NORTH = ft_strdup(line);
+			cub->txt_N = ft_strdup(line);
 		}
 		else if (*line == 'S' && *(line + 1) == 'O' && ft_isspace(*(line + 2)))
 		{
-			if (cub->TEXTURE_SOUTH != NULL)
+			if (cub->txt_S != NULL)
 				ft_exception("Duplicated south texture");
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
-			cub->TEXTURE_SOUTH = ft_strdup(line);
+			cub->txt_S = ft_strdup(line);
 		}
 		else if (*line == 'W' && *(line + 1) == 'E' && ft_isspace(*(line + 2)))
 		{
-			if (cub->TEXTURE_WEST != NULL)
+			if (cub->txt_W != NULL)
 				ft_exception("Duplicated west texture");
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
-			cub->TEXTURE_WEST = ft_strdup(line);
+			cub->txt_W = ft_strdup(line);
 		}
 		else if (*line == 'E' && *(line + 1) == 'A' && ft_isspace(*(line + 2)))
 		{
-			if (cub->TEXTURE_EAST != NULL)
+			if (cub->txt_E != NULL)
 				ft_exception("Duplicated east texture");
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
-			cub->TEXTURE_EAST = ft_strdup(line);
+			cub->txt_E = ft_strdup(line);
 		}
 		else if (*line == 'S' && ft_isspace(*(line + 1)))
 		{
-			if (cub->TEXTURE_SPRITE != NULL)
+			if (cub->txt_SPR != NULL)
 				ft_exception("Duplicated sprite texture");
 			line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->TEXTURE_SPRITE = ft_strdup(line);
+			cub->txt_SPR = ft_strdup(line);
 		}
 		else if (*line == 'F' && ft_isspace(*(line + 1)))
 		{
-			if (cub->FLOOR_COLOR[0] != -1 && cub->FLOOR_COLOR[1] != -1 && cub->FLOOR_COLOR[2] != -1)
+			if (cub->f_rgb[0] != -1 && cub->f_rgb[1] != -1 && cub->f_rgb[2] != -1)
 				ft_exception("Duplicated floor color");
 			line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->FLOOR_COLOR[0] = ft_atoi(line);
+			cub->f_rgb[0] = ft_atoi(line);
 			while (ft_isdigit(*line))
 				line++;
 			while (ft_isspace(*line))
@@ -328,7 +360,7 @@ static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 				line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->FLOOR_COLOR[1] = ft_atoi(line);
+			cub->f_rgb[1] = ft_atoi(line);
 			while (ft_isdigit(*line))
 				line++;
 			while (ft_isspace(*line))
@@ -339,16 +371,16 @@ static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 				line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->FLOOR_COLOR[2] = ft_atoi(line);
+			cub->f_rgb[2] = ft_atoi(line);
 		}
 		else if (*line == 'C' && *(line + 1) == ' ')
 		{
-			if (cub->CEILING_COLOR[0] != -1 && cub->CEILING_COLOR[1] != -1 && cub->CEILING_COLOR[2] != -1)
+			if (cub->c_rgb[0] != -1 && cub->c_rgb[1] != -1 && cub->c_rgb[2] != -1)
 				ft_exception("Duplicated ceiling color");
 			line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->CEILING_COLOR[0] = ft_atoi(line);
+			cub->c_rgb[0] = ft_atoi(line);
 			while (ft_isdigit(*line))
 				line++;
 			while (ft_isspace(*line))
@@ -359,7 +391,7 @@ static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 				line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->CEILING_COLOR[1] = ft_atoi(line);
+			cub->c_rgb[1] = ft_atoi(line);
 			while (ft_isdigit(*line))
 				line++;
 			while (ft_isspace(*line))
@@ -370,7 +402,7 @@ static void ft_parseFileCub_bis(int fd, t_cub *cub, t_list **list_map)
 				line++;
 			while (ft_isspace(*line))
 				line++;
-			cub->CEILING_COLOR[2] = ft_atoi(line);
+			cub->c_rgb[2] = ft_atoi(line);
 		}
 		else if (ft_ismap(line))
 			ft_exception("Wrong first map line");
@@ -395,179 +427,416 @@ int ft_mapmaxwidth(t_list *list_map)
 	return ((int)max);
 }
 
-void ft_parseFileCub(int fd, t_cub *cub)
+void ft_parseFileCub(int fd, t_system *sys)
 {
 	t_list *list_map;
 	t_list *list_map_temp;
 	int i;
 
 	list_map = NULL;
-	ft_parseFileCub_bis(fd, cub, &list_map);
-	cub->MAP_HEIGHT = ft_lstsize(list_map);
-	if ((cub->MAP = (char **)malloc((cub->MAP_HEIGHT + 1) * sizeof(char *))) == NULL)
+	ft_parseFileCub_bis(fd, &sys->cub, &list_map);
+	sys->cub.map_H = ft_lstsize(list_map);
+	if ((sys->cub.map = (char **)malloc((sys->cub.map_H + 1) * sizeof(char *))) == NULL)
 		ft_exception("Malloc fail during map creation (step 1)");
-	cub->MAP_WIDTH = ft_mapmaxwidth(list_map);
+	sys->cub.map_W = ft_mapmaxwidth(list_map);
 	i = 0;
 	list_map_temp = list_map;
 	while (list_map)
 	{
-		if ((cub->MAP[i] = ft_strndupfill(list_map->content, cub->MAP_WIDTH, ' ')) == NULL)
+		if ((sys->cub.map[i] = ft_strndupfill(list_map->content, sys->cub.map_W, ' ')) == NULL)
 			ft_exception("Malloc fail during map creation (step 2)");
 		list_map = list_map->next;
 		i++;
 	}
-	cub->MAP[i] = NULL;
+	sys->cub.map[i] = NULL;
 	ft_lstclear(&list_map_temp, free);
-	ft_controlErrorCub(cub);
+	ft_controlError(sys);
 }
 
 void ft_printCub(t_cub cub)
 {
-	ft_printf("RESOLUTION_X: %d  RESOLUTION_Y: %d\n", cub.RESOLUTION_X, cub.RESOLUTION_Y);
-	ft_printf("TEXTURE_NORTH: %s\n", cub.TEXTURE_NORTH);
-	ft_printf("TEXTURE_SOUTH: %s\n", cub.TEXTURE_SOUTH);
-	ft_printf("TEXTURE_WEST: %s\n", cub.TEXTURE_WEST);
-	ft_printf("TEXTURE_EAST: %s\n", cub.TEXTURE_EAST);
-	ft_printf("TEXTURE_SPRITE: %s\n", cub.TEXTURE_SPRITE);
-	ft_printf("FLOOR_COLOR [R: %d, G: %d, B: %d]\n", cub.FLOOR_COLOR[0], cub.FLOOR_COLOR[1], cub.FLOOR_COLOR[2]);
-	ft_printf("CEILING_COLOR [R: %d, G: %d, B: %d]\n", cub.CEILING_COLOR[0], cub.CEILING_COLOR[1], cub.CEILING_COLOR[2]);
-	ft_printf("MAP_SIZE [WIDTH: %d, HEIGHT: %d]\n", cub.MAP_WIDTH, cub.MAP_HEIGHT);
-	ft_printf("START PLAYER [X: %d, Y: %d, DIR: %c]\n", cub.START_X, cub.START_Y, cub.START_DIR);
-	ft_printf("MAP:\n");
-	while (*cub.MAP)
-		ft_printf("--> %s\n", *cub.MAP++);
+	ft_printf("res_x: %d  res_y: %d\n", cub.res_x, cub.res_y);
+	ft_printf("txt_N: %s\n", cub.txt_N);
+	ft_printf("txt_S: %s\n", cub.txt_S);
+	ft_printf("txt_W: %s\n", cub.txt_W);
+	ft_printf("txt_E: %s\n", cub.txt_E);
+	ft_printf("txt_SPR: %s\n", cub.txt_SPR);
+	ft_printf("f_rgb [R: %d, G: %d, B: %d]\n", cub.f_rgb[0], cub.f_rgb[1], cub.f_rgb[2]);
+	ft_printf("c_rgb [R: %d, G: %d, B: %d]\n", cub.c_rgb[0], cub.c_rgb[1], cub.c_rgb[2]);
+	ft_printf("MAP_SIZE [WIDTH: %d, HEIGHT: %d]\n", cub.map_W, cub.map_H);
+	ft_printf("map:\n");
+	while (*cub.map)
+		ft_printf("--> %s\n", *cub.map++);
 }
 
-typedef struct s_img_data
+
+/*      //draw the pixels of the stripe as a vertical line
+      ft_print_verLine(x, drawStart, drawEnd, color);*/
+
+int ft_print_verLine (int x, int start, int stop, int color, t_system *sys)
 {
-	void *img;
-	char *addr;
-	int bits_per_pixel;
-	int line_length;
-	int endian;
-} t_img_data;
-
-int ft_create_color(int red, int green, int blue, int alpha, t_img_data img, void *mlx)
-{
-	int color;
-
-	if (img.endian == 0)
-		color = (alpha << 24 | red << 16 | green << 8 | blue);
-	else if (img.endian == 1)
-		color = (red << 24 | green << 16 | blue << 8 | alpha);
-	/*another type of pixel another type of mask*/
-	if (img.bits_per_pixel != 32)
-		color = mlx_get_color_value(mlx, color);
-	return (color);
-}
-
-void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_img_data img)
-{
-	int offset = (y * img.line_length + x * (img.bits_per_pixel / 8));
-
-	if (img.endian == 1) //ARGB
+	for (int _y = 0; _y < sys->cub.res_y; ++_y)
 	{
-		img.addr[offset + 0] = a;
-		img.addr[offset + 1] = r;
-		img.addr[offset + 2] = g;
-		img.addr[offset + 3] = b;
+		if(_y >= start && _y <= stop)
+			ft_print_pixel(x, _y, 255, 0, 0, 0, sys);
 	}
-	else if (img.endian == 0) //BGRA
+	return (0);
+}
+
+int test(t_system *sys)
+{
+	mlx_destroy_image(sys->mlx_vars.mlx, sys->img.img);
+
+	sys->img.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
+
+	sys->img.addr = mlx_get_data_addr(sys->img.img, &sys->img.bpp, &sys->img.line_len, &sys->img.endian);
+
+		/*print sky*/
+	for (int y = 0; y < sys->cub.res_y / 2; ++y)
 	{
-		img.addr[offset + 0] = b;
-		img.addr[offset + 1] = g;
-		img.addr[offset + 2] = r;
-		img.addr[offset + 3] = a;
+		for (int x = 0; x < sys->cub.res_x; ++x)
+		{
+			ft_print_pixel(x, y, sys->cub.c_rgb[0], sys->cub.c_rgb[1], sys->cub.c_rgb[2], 0, sys);
+		}
+	}
+	/*print floor*/
+	for (int y = sys->cub.res_y / 2; y < sys->cub.res_y; ++y)
+	{
+		for (int x = 0; x < sys->cub.res_x; ++x)
+		{
+			ft_print_pixel(x, y, sys->cub.f_rgb[0], sys->cub.f_rgb[1], sys->cub.f_rgb[2], 0, sys);
+		}
+	}
+	
+	double posX = sys->player.pos_x;
+	double posY = sys->player.pos_y;  //x and y start position
+	double dirX = sys->player.dir_x;
+	double dirY = sys->player.dir_y; //initial direction vector
+	double planeX = sys->player.plane_x;
+	double planeY = sys->player.plane_y; //the 2d raycaster version of camera plane
+
+	double time = 0; //time of current frame
+	double oldTime = 0; //time of previous frame
+
+	for(int x = 0; x < sys->cub.res_x; x++)
+	{
+		
+		//calculate ray position and direction
+		double cameraX = 2.0 * x / (double)sys->cub.res_x - 1.0; //x-coordinate in camera space
+		double rayDirX = dirX + planeX * cameraX;
+		double rayDirY = dirY + planeY * cameraX;
+		//which box of the map we're in
+		int mapX = (int)posX;
+		int mapY = (int)posY;
+
+		//length of ray from current position to next x or y-side
+		double sideDistX;
+		double sideDistY;
+
+		//length of ray from one x or y-side to next x or y-side
+		double deltaDistX = fabs(1 / rayDirX);
+		double deltaDistY = fabs(1 / rayDirY);
+		double perpWallDist;
+
+		//what direction to step in x or y-direction (either +1 or -1)
+		int stepX;
+		int stepY;
+
+		int hit = 0; //was there a wall hit?
+		int side; //was a NS or a EW wall hit?
+		//calculate step and initial sideDist
+		if(rayDirX < 0)
+		{
+			stepX = -1;
+			sideDistX = (posX - mapX) * deltaDistX;
+		}
+		else
+		{
+			stepX = 1;
+			sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+		}
+		if(rayDirY < 0)
+		{
+			stepY = -1;
+			sideDistY = (posY - mapY) * deltaDistY;
+		}
+		else
+		{
+			stepY = 1;
+			sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+		}
+		
+		//perform DDA
+		while (hit == 0)
+		{
+			//jump to next map square, OR in x-direction, OR in y-direction
+			if(sideDistX < sideDistY)
+			{
+			sideDistX += deltaDistX;
+			mapX += stepX;
+			side = 0;
+			}
+			else
+			{
+			sideDistY += deltaDistY;
+			mapY += stepY;
+			side = 1;
+			}
+			//Check if ray has hit a wall
+			if(sys->cub.map[mapY][mapX] > 0) hit = 1;
+		}
+		//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
+		if(side == 0) perpWallDist = (mapX - posX + (1.0 - stepX) / 2.0) / rayDirX;
+		else          perpWallDist = (mapY - posY + (1.0 - stepY) / 2.0) / rayDirY;
+
+		//Calculate height of line to draw on screen
+		int lineHeight = (int)(sys->cub.res_y / perpWallDist);
+
+		//calculate lowest and highest pixel to fill in current stripe
+		int drawStart = -lineHeight / 2 + sys->cub.res_y / 2;
+		if(drawStart < 0)drawStart = 0;
+		int drawEnd = lineHeight / 2 + sys->cub.res_y/ 2;
+		if(drawEnd >= sys->cub.res_y)drawEnd = sys->cub.res_y - 1;
+
+		//choose wall color
+		/*
+		int color;
+		switch(sys->cub.map[mapY][mapX])
+		{
+			case 1:  color = 0XFF000000; break;
+			case 2:  color = 0x0000FF00; break;
+			default: color = 0X00000000; break;
+		}
+
+		//give x and y sides different brightness
+		//if(side == 1) {color = color / 2;}
+
+		*/
+		//draw the pixels of the stripe as a vertical line
+		ft_print_verLine(x, drawStart, drawEnd, 0, sys);
+		//ft_print_verLine(x, 0, 0, color, sys);
+		
+	
+		//timing for input and FPS counter
+		//oldTime = time;
+		//time = ;
+		//double frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
+		//ft_printf("FPS: %d\n", 1.0 / frameTime); //FPS counter
+
+		//speed modifiers
+		//double moveSpeed = frameTime * 5.0; //the constant value is in squares/second
+		//double rotSpeed = frameTime * 3.0; //the constant value is in radians/second
+
+		
+		//move forward if no wall in front of you
+		if(sys->player.move == 'U')
+		{
+			//if(worldMap[int(posX + dirX * moveSpeed)][int(posY)] == false) posX += dirX * moveSpeed;
+			//if(worldMap[int(posX)][int(posY + dirY * moveSpeed)] == false) posY += dirY * moveSpeed;
+			sys->player.pos_x += dirX;
+			sys->player.pos_y += dirY;
+			sys->player.move = '0';
+			ft_printf("AVANTI");
+		}
+		/*
+		//move backwards if no wall behind you
+		else if(sys->player.move == 'D')
+		{
+			if(worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) posX -= dirX * moveSpeed;
+			if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
+		}
+		//rotate to the right
+		else if(sys->player.move == '+')
+		{
+			//both camera direction and camera plane must be rotated
+			double oldDirX = dirX;
+			dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
+			dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
+			double oldPlaneX = planeX;
+			planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
+			planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
+		}
+		//rotate to the left
+		else if(sys->player.move == '-')
+		{
+			//both camera direction and camera plane must be rotated
+			double oldDirX = dirX;
+			dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
+			dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);
+			double oldPlaneX = planeX;
+			planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
+			planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
+		}
+	*/
+	}
+
+	mlx_put_image_to_window(sys->mlx_vars.mlx, sys->mlx_vars.win, sys->img.img, 0, 0);
+
+  	return (0);
+}
+
+void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_system *sys)
+{
+	int offset = (y * sys->img.line_len + x * (sys->img.bpp / 8));
+
+	if (sys->img.endian == 1) //ARGB
+	{
+		sys->img.addr[offset + 0] = a;
+		sys->img.addr[offset + 1] = r;
+		sys->img.addr[offset + 2] = g;
+		sys->img.addr[offset + 3] = b;
+	}
+	else if (sys->img.endian == 0) //BGRA
+	{
+		sys->img.addr[offset + 0] = b;
+		sys->img.addr[offset + 1] = g;
+		sys->img.addr[offset + 2] = r;
+		sys->img.addr[offset + 3] = a;
 	}
 }
 
-typedef struct  s_vars {
-    void        *mlx;
-    void        *win;
-}               t_vars;
-
-int             key_hook(int keycode, t_vars *vars)
+int key_hook(int keycode, t_system *sys)
 {
-    //ft_printf("keycode: %d\n", keycode);
+	double moveSpeed = 0.2;
+	//ft_printf("keycode: %d\n", keycode);
 	//ESC 65307
-	if (keycode == 65307)
+	if (keycode == 65307 || keycode == 53)
 	{
 		ft_printf("Good bye my little friend..\n");
 		exit(0);
 	}
 	//A 97
-	else if (keycode == 97)
+	else if (keycode == 97 || keycode == 0)
 	{
 		ft_printf("LEFT\n");
+		sys->player.move = 'L';
 	}
 	//D 100
-	else if (keycode == 100)
+	else if (keycode == 100 || keycode == 2)
 	{
 		ft_printf("RIGHT\n");
+		sys->player.move = 'R';
 	}
 	//W 119
-	else if (keycode == 119)
+	else if (keycode == 119 || keycode == 13)
 	{
 		ft_printf("UP\n");
+		sys->player.move = 'U';
 	}
 	//S 115
-	else if (keycode == 115)
+	else if (keycode == 115 || keycode == 1)
 	{
 		ft_printf("DOWN\n");
+		sys->player.move = 'D';
 	}
-	//<-- 65361 
-	else if (keycode == 65361)
+	//<-- 65361
+	else if (keycode == 65361 || keycode == 123)
 	{
 		ft_printf("TURN LEFT\n");
+		sys->player.move = '-';
 	}
 	//--> 65363
-	else if (keycode == 65363)
+	else if (keycode == 65363 || keycode == 124)
 	{
 		ft_printf("TURN RIGHT\n");
+		sys->player.move = '+';
 	}
+	return (0);
 }
 
-void screen(t_cub *cub, void *mlx)
+void ft_render_next_frame(t_system *sys)
 {
-	t_vars vars;
-	t_img_data img;
+	mlx_destroy_image(sys->mlx_vars.mlx, sys->img.img);
 
-	/* WINDOW */
-	vars.mlx = mlx;
-	vars.win = mlx_new_window(mlx, cub->RESOLUTION_X, cub->RESOLUTION_Y, "Cub3D D2435");
+	sys->img.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
 
-	img.img = mlx_new_image(mlx, cub->RESOLUTION_X, cub->RESOLUTION_Y);
-
-	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length, &img.endian);
+	sys->img.addr = mlx_get_data_addr(sys->img.img, &sys->img.bpp, &sys->img.line_len, &sys->img.endian);
+	//sys->cub.c_rgb[0]++;
 
 	/*print sky*/
-	for (int y = 0; y < cub->RESOLUTION_Y / 2; ++y)
+	for (int y = 0; y < sys->cub.res_y / 2; ++y)
 	{
-		for (int x = 0; x < cub->RESOLUTION_X; ++x)
+		for (int x = 0; x < sys->cub.res_x; ++x)
 		{
-			ft_print_pixel(x, y, cub->CEILING_COLOR[0], cub->CEILING_COLOR[1], cub->CEILING_COLOR[2], 255, img);
+			ft_print_pixel(x, y, sys->cub.c_rgb[0], sys->cub.c_rgb[1], sys->cub.c_rgb[2], 0, sys);
 		}
 	}
 	/*print floor*/
-	for (int y = cub->RESOLUTION_Y / 2; y < cub->RESOLUTION_Y; ++y)
+	for (int y = sys->cub.res_y / 2; y < sys->cub.res_y; ++y)
 	{
-		for (int x = 0; x < cub->RESOLUTION_X; ++x)
+		for (int x = 0; x < sys->cub.res_x; ++x)
 		{
-			ft_print_pixel(x, y, cub->FLOOR_COLOR[0], cub->FLOOR_COLOR[1], cub->FLOOR_COLOR[2], 255, img);
+			ft_print_pixel(x, y, sys->cub.f_rgb[0], sys->cub.f_rgb[1], sys->cub.f_rgb[2], 0, sys);
 		}
 	}
 
-	mlx_put_image_to_window(mlx, vars.win, img.img, 0, 0);
-	mlx_destroy_image(mlx, img.img);
+	/* MOSCA XD*/
+	int r_x = rand() % sys->cub.res_x;
+	int r_y = rand() % sys->cub.res_y;
+	ft_print_pixel(r_x, r_y, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x + 1, r_y + 1, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x - 1, r_y - 1, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x - 1, r_y + 1, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x + 1, r_y - 1, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x + 2, r_y + 2, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x - 2, r_y - 2, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x - 2, r_y + 2, 0, 0, 0, 0, sys);
+	ft_print_pixel(r_x + 2, r_y - 2, 0, 0, 0, 0, sys);
+	/*FINE MOSCA*/
 
-	//mlx_hook(vars.win, 2, 1L<<0, close, &vars);
-	mlx_key_hook(vars.win, key_hook, &vars);
+	mlx_put_image_to_window(sys->mlx_vars.mlx, sys->mlx_vars.win, sys->img.img, 0, 0);
+}
+
+void screen(t_system *sys)
+{
+	/* WINDOW */
+	sys->mlx_vars.win = mlx_new_window(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y, "Cub3D D2435");
+
+	sys->img.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
+
+	sys->img.addr = mlx_get_data_addr(sys->img.img, &sys->img.bpp, &sys->img.line_len, &sys->img.endian);
+
+	mlx_key_hook(sys->mlx_vars.win, key_hook, &sys);
+
+	//mlx_loop_hook(sys->mlx_vars.mlx, ft_render_next_frame, sys);
+	mlx_loop_hook(sys->mlx_vars.mlx, test, sys);
+
+	mlx_loop(sys->mlx_vars.mlx);
+}
+
+int ft_init_system(t_system *sys)
+{
+	sys->cub.res_x = -1;
+	sys->cub.res_y = -1;
+	sys->cub.txt_N = NULL;
+	sys->cub.txt_S = NULL;
+	sys->cub.txt_W = NULL;
+	sys->cub.txt_E = NULL;
+	sys->cub.txt_SPR = NULL;
+	sys->cub.f_rgb[0] = -1;
+	sys->cub.f_rgb[1] = -1;
+	sys->cub.f_rgb[2] = -1;
+	sys->cub.c_rgb[0] = -1;
+	sys->cub.c_rgb[1] = -1;
+	sys->cub.c_rgb[2] = -1;
+	sys->cub.map = NULL;
+	sys->cub.map_W = -1;
+	sys->cub.map_H = -1;
+
+	sys->player.pos_x = -1;
+	sys->player.pos_y = -1;
+	sys->player.dir_x = 0;
+	sys->player.dir_y = 0;
+	sys->player.plane_x = 0;
+	sys->player.plane_y = 0.66;
+	sys->player.move = '0';
+
+	return (0);
 }
 
 int main(int argc, char **argv)
 {
-
-	t_cub cub;
+	t_system sys;
 	void *mlx;
 	int win_x;
 	int win_y;
@@ -577,21 +846,24 @@ int main(int argc, char **argv)
 	else if (argc > 3)
 		ft_exception("Too many arguments");
 
-	/* PARSING MAP */
+	/* PARSING map */
 	int fd = open(argv[1], O_RDONLY);
-	ft_initCub(&cub);
-	ft_parseFileCub(fd, &cub);
-	close(fd);
-	//ft_printCub(cub);
+	ft_init_system(&sys);
 
-	mlx = mlx_init();
-	if (!mlx)
+	ft_parseFileCub(fd, &sys);
+	close(fd);
+	//ft_printCub(sys.cub);
+
+	sys.mlx_vars.mlx = mlx_init();
+	if (!sys.mlx_vars.mlx)
 		ft_exception("Mlx failed start");
-	mlx_get_screen_size(mlx, &win_x, &win_y);
-	if (cub.RESOLUTION_X > win_x || cub.RESOLUTION_Y > win_y)
-		ft_exception("Resolution not supported");
-	screen(&cub, mlx);
-	mlx_loop(mlx);
+
+	//mlx_get_screen_size(mlx, &win_x, &win_y);
+	//if (cub.res_x > win_x || cub.res_y > win_y)
+	//	ft_exception("Resolution not supported");
+
+	screen(&sys);
 	/*FINE*/
-	ft_freecub(&cub);
+	ft_freecub(&sys.cub);
+	return (0);
 }
