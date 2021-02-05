@@ -34,6 +34,7 @@ SRCS		= 	ft_memset.c \
 				ft_strrchr.c \
 				ft_strnstr.c \
 				ft_strncmp.c \
+				ft_strcmp.c \
 				ft_atoi.c \
 				ft_isalpha.c \
 				ft_isdigit.c \

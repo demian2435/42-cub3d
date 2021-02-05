@@ -35,7 +35,7 @@ ${NAME}: ${OBJS} ft mlx
 
 mlx:
 	make -C ${MLX_DIR}
-	mv ${MLX_DIR}/libmlx.dylib .
+	#mv ${MLX_DIR}/libmlx.dylib .
 
 ft:
 	make -C ${FT_DIR}
@@ -60,6 +60,7 @@ v: ${NAME}
 	valgrind --leak-check=full \
 	--show-leak-kinds=all \
 	--track-origins=yes \
+	--verbose \
 	--verbose \
 	--log-file=./extra/valgrind-out.txt \
 	./${NAME} ${MAP} && cat ./extra/valgrind-out.txt
