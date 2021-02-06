@@ -64,7 +64,9 @@ typedef struct s_player
 	double plane_x;
 	double plane_y;
 	double speed;
-	int move;
+	int move_y;
+	int move_x;
+	int move_r;
 } t_player;
 
 typedef struct s_system
@@ -506,37 +508,42 @@ int ft_key_press(int keycode, t_system *sys)
 	//ft_printf("keycode: %d\n", keycode);
 	if (keycode == 65307 || keycode == 53)
 	{
+		if (sys->mlx_vars.win)
+		{
+			mlx_destroy_window(sys->mlx_vars.mlx, sys->mlx_vars.win);
+			sys->mlx_vars.win = NULL;
+		}
 		ft_key_exit(sys);
 	}
 	//A 97
 	else if (keycode == 97 || keycode == 0)
 	{
-		sys->player.move = LEFT;
+		sys->player.move_x = LEFT;
 	}
 	//D 100
 	else if (keycode == 100 || keycode == 2)
 	{
-		sys->player.move = RIGHT;
+		sys->player.move_x = RIGHT;
 	}
 	//W 119
 	else if (keycode == 119 || keycode == 13)
 	{
-		sys->player.move = UP;
+		sys->player.move_y = UP;
 	}
 	//S 115
 	else if (keycode == 115 || keycode == 1)
 	{
-		sys->player.move = DOWN;
+		sys->player.move_y = DOWN;
 	}
 	//<-- 65361
 	else if (keycode == 65361 || keycode == 123)
 	{
-		sys->player.move = R_LEFT;
+		sys->player.move_r = R_LEFT;
 	}
 	//--> 65363
 	else if (keycode == 65363 || keycode == 124)
 	{
-		sys->player.move = R_RIGHT;
+		sys->player.move_r = R_RIGHT;
 	}
 	return (0);
 }
@@ -545,34 +552,34 @@ int ft_key_release(int keycode, t_system *sys)
 {
 	//ft_printf("keycode: %d\n", keycode);
 	//A 97
-	if ((keycode == 97 || keycode == 0) && sys->player.move == LEFT)
+	if ((keycode == 97 || keycode == 0) && sys->player.move_x == LEFT)
 	{
-		sys->player.move = 0;
+		sys->player.move_x = 0;
 	}
 	//D 100
-	else if ((keycode == 100 || keycode == 2) && sys->player.move == RIGHT)
+	else if ((keycode == 100 || keycode == 2) && sys->player.move_x == RIGHT)
 	{
-		sys->player.move = 0;
+		sys->player.move_x = 0;
 	}
 	//W 119
-	else if ((keycode == 119 || keycode == 13) && sys->player.move == UP)
+	else if ((keycode == 119 || keycode == 13) && sys->player.move_y == UP)
 	{
-		sys->player.move = 0;
+		sys->player.move_y = 0;
 	}
 	//S 115
-	else if ((keycode == 115 || keycode == 1) && sys->player.move == DOWN)
+	else if ((keycode == 115 || keycode == 1) && sys->player.move_y == DOWN)
 	{
-		sys->player.move = 0;
+		sys->player.move_y = 0;
 	}
 	//<-- 65361
-	else if ((keycode == 65361 || keycode == 123) && sys->player.move == R_LEFT)
+	else if ((keycode == 65361 || keycode == 123) && sys->player.move_r == R_LEFT)
 	{
-		sys->player.move = 0;
+		sys->player.move_r = 0;
 	}
 	//--> 65363
-	else if ((keycode == 65363 || keycode == 124) && sys->player.move == R_RIGHT)
+	else if ((keycode == 65363 || keycode == 124) && sys->player.move_r == R_RIGHT)
 	{
-		sys->player.move = 0;
+		sys->player.move_r = 0;
 	}
 	return (0);
 }
@@ -600,9 +607,10 @@ int ft_key_exit(t_system *sys)
 	if (sys->frame.img)
 		mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
 	if (sys->mlx_vars.win)
-		mlx_destroy_window(sys->mlx_vars.mlx, sys->mlx_vars.win);
+		free(sys->mlx_vars.win);
 	if (sys->mlx_vars.mlx)
 		mlx_destroy_display(sys->mlx_vars.mlx);
+	free(sys->mlx_vars.mlx);
 	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435\n* * * * * * * * * * * * * *\n Good bye my little friend\n* * * * * * * * * * * * * *\n");
 	exit(0);
 }
@@ -759,7 +767,7 @@ int ft_next_frame(t_system *sys)
 		x++;
 	}
 	/*MOVIMENTO PLAYER*/
-	if (sys->player.move == R_LEFT)
+	if (sys->player.move_r == R_LEFT)
 	{
 		double olddirx;
 		double oldplanex;
@@ -772,7 +780,7 @@ int ft_next_frame(t_system *sys)
 		sys->player.plane_x = (sys->player.plane_x * cos(-0.02)) - (sys->player.plane_y * sin(-0.02));
 		sys->player.plane_y = (oldplanex * sin(-0.02)) + (sys->player.plane_y * cos(-0.02));
 	}
-	if (sys->player.move == R_RIGHT)
+	else if (sys->player.move_r == R_RIGHT)
 	{
 		double olddirx;
 		double oldplanex;
@@ -785,7 +793,7 @@ int ft_next_frame(t_system *sys)
 		sys->player.plane_x = (sys->player.plane_x * cos(0.02)) - (sys->player.plane_y * sin(0.02));
 		sys->player.plane_y = (oldplanex * sin(0.02)) + (sys->player.plane_y * cos(0.02));
 	}
-	if (sys->player.move == LEFT)
+	if (sys->player.move_x == LEFT)
 	{
 		double olddirx;
 		double olddiry;
@@ -811,7 +819,7 @@ int ft_next_frame(t_system *sys)
 			sys->player.dir_y = new_dir_y;
 		}
 	}
-	if (sys->player.move == RIGHT)
+	else if (sys->player.move_x == RIGHT)
 	{
 		double olddirx;
 		double olddiry;
@@ -837,7 +845,7 @@ int ft_next_frame(t_system *sys)
 			sys->player.dir_y = new_dir_y;
 		}
 	}
-	if (sys->player.move == UP)
+	if (sys->player.move_y == UP)
 	{
 		double new_x = sys->player.pos_x + sys->player.dir_x * sys->player.speed;
 		double new_y = sys->player.pos_y + sys->player.dir_y * sys->player.speed;
@@ -847,7 +855,7 @@ int ft_next_frame(t_system *sys)
 			sys->player.pos_y = new_y;
 		}
 	}
-	if (sys->player.move == DOWN)
+	else if (sys->player.move_y == DOWN)
 	{
 		double new_x = sys->player.pos_x - sys->player.dir_x * sys->player.speed;
 		double new_y = sys->player.pos_y - sys->player.dir_y * sys->player.speed;
@@ -907,7 +915,9 @@ int ft_init_system(t_system *sys)
 	sys->player.plane_x = 0;
 	sys->player.plane_y = 0;
 	sys->player.speed = 0;
-	sys->player.move = 0;
+	sys->player.move_x = 0;
+	sys->player.move_y = 0;
+	sys->player.move_r = 0;
 	return (0);
 }
 
