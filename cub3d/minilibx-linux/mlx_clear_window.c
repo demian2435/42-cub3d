@@ -8,14 +8,11 @@
 ** Last update Tue Sep 25 17:11:19 2001 Charlie Root
 */
 
+#include "mlx_int.h"
 
-
-#include	"mlx_int.h"
-
-
-int		mlx_clear_window(t_xvar *xvar,t_win_list *win)
+int mlx_clear_window(t_xvar *xvar, t_win_list *win)
 {
-  XClearWindow(xvar->display,win->window);
-  if (xvar->do_flush)
-    XFlush(xvar->display);
+	XClearWindow(xvar->display, win->window);
+	if (xvar->do_flush)
+		XFlush(xvar->display);
 }

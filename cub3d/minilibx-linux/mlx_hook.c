@@ -8,33 +8,27 @@
 ** Last update Fri Jan 28 17:05:28 2005 Olivier Crouzet
 */
 
+#include "mlx_int.h"
 
-#include	"mlx_int.h"
-
-
-
-
-int	mlx_hook(t_win_list *win, int x_event, int x_mask, 
-		 int (*funct)(),void *param)
+int mlx_hook(t_win_list *win, int x_event, int x_mask,
+			 int (*funct)(), void *param)
 {
-  win->hooks[x_event].hook = funct;
-  win->hooks[x_event].param = param;
-  win->hooks[x_event].mask = x_mask;
+	win->hooks[x_event].hook = funct;
+	win->hooks[x_event].param = param;
+	win->hooks[x_event].mask = x_mask;
 }
 
-
-int	mlx_do_key_autorepeatoff(t_xvar *xvar)
+int mlx_do_key_autorepeatoff(t_xvar *xvar)
 {
-  XAutoRepeatOff(xvar->display);
+	XAutoRepeatOff(xvar->display);
 }
 
-int	mlx_do_key_autorepeaton(t_xvar *xvar)
+int mlx_do_key_autorepeaton(t_xvar *xvar)
 {
-  XAutoRepeatOn(xvar->display);
+	XAutoRepeatOn(xvar->display);
 }
 
-
-int	mlx_do_sync(t_xvar *xvar)
+int mlx_do_sync(t_xvar *xvar)
 {
-  XSync(xvar->display, False);
+	XSync(xvar->display, False);
 }

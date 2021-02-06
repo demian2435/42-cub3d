@@ -8,18 +8,14 @@
 ** Last update Fri Feb 23 17:08:48 2001 Charlie Root
 */
 
+#include "mlx_int.h"
 
-#include	"mlx_int.h"
-
-
-
-
-int	mlx_flush_event(t_xvar *xvar)
+int mlx_flush_event(t_xvar *xvar)
 {
-  XEvent	ev;
+	XEvent ev;
 
-  while (XPending(xvar->display))
-  {
-     XNextEvent(xvar->display,&ev);
-  }
+	while (XPending(xvar->display))
+	{
+		XNextEvent(xvar->display, &ev);
+	}
 }

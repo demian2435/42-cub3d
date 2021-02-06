@@ -8,7 +8,7 @@ CC			= gcc
 
 OPT			= -O3
 
-FLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror
 
 SRCS		= main.c
 

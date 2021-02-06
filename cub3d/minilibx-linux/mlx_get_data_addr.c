@@ -8,16 +8,13 @@
 ** Last update Thu Sep 27 19:05:25 2001 Charlie Root
 */
 
+#include "mlx_int.h"
 
-
-#include	"mlx_int.h"
-
-
-char	*mlx_get_data_addr(t_img *img,int *bpp,
-			   int *size_line,int *endian)
+char *mlx_get_data_addr(t_img *img, int *bpp,
+						int *size_line, int *endian)
 {
-  *bpp = img->bpp;
-  *size_line = img->size_line;
-  *endian = img->image->byte_order;
-  return (img->data);
+	*bpp = img->bpp;
+	*size_line = img->size_line;
+	*endian = img->image->byte_order;
+	return (img->data);
 }
