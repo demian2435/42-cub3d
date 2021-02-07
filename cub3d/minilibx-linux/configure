@@ -72,19 +72,11 @@ else
 fi
 
 
-/bin/echo "INC=$conf_inc" > Makefile.gen
-/bin/echo "HT=$conf_ht" >> Makefile.gen
-/bin/echo "DOCP=$conf_docp" >> Makefile.gen
-cat Makefile.mk | grep -v %%%% >> Makefile.gen
-
 
 if [ -n "$1" -a "$1" = "clean" ] ; then
     echo "Now make it clean."
     make -f Makefile.gen clean
-    (cd test ; make -f Makefile.gen clean)
     exit
 fi
 
-echo "Now make it."
 make -f Makefile.gen all
-(cd test ; make -f Makefile.gen all )

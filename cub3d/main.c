@@ -22,6 +22,12 @@
 #define UP 50
 #define DOWN 60
 
+typedef struct s_xy
+{
+	double x;
+	double y;
+} t_xy;
+
 typedef struct s_img_data
 {
 	void *img;
@@ -42,6 +48,8 @@ typedef struct s_cub
 	t_img_data txt_W;
 	t_img_data txt_E;
 	t_img_data txt_SPR;
+	int n_sprites;
+	t_list *sprites;
 	int f_rgb[3];
 	int c_rgb[3];
 	char **map;
@@ -113,22 +121,22 @@ void ft_set_player_start(t_system *sys, int x, int y)
 	if (sys->cub.map[y][x] == 'N')
 	{
 		sys->player.dir_y = -1;
-		sys->player.plane_x = (((double)sys->cub.map_W / (double)sys->cub.map_H) - 1.0);
+		sys->player.plane_x = (((double)sys->cub.res_x / (double)sys->cub.res_y) - 1.0);
 	}
 	else if (sys->cub.map[y][x] == 'S')
 	{
 		sys->player.dir_y = 1;
-		sys->player.plane_x = -(((double)sys->cub.map_W / (double)sys->cub.map_H) - 1.0);
+		sys->player.plane_x = -(((double)sys->cub.res_x / (double)sys->cub.res_y) - 1.0);
 	}
 	else if (sys->cub.map[y][x] == 'E')
 	{
 		sys->player.dir_x = 1;
-		sys->player.plane_y = (((double)sys->cub.map_W / (double)sys->cub.map_H) - 1.0);
+		sys->player.plane_y = (((double)sys->cub.res_x / (double)sys->cub.res_y) - 1.0);
 	}
 	else if (sys->cub.map[y][x] == 'W')
 	{
 		sys->player.dir_x = -1;
-		sys->player.plane_y = -(((double)sys->cub.map_W / (double)sys->cub.map_H) - 1.0);
+		sys->player.plane_y = -(((double)sys->cub.res_x / (double)sys->cub.res_y) - 1.0);
 	}
 	if (!(sys->player.dir_x) && !(sys->player.plane_x))
 		sys->player.plane_x = 0.5 * sys->player.dir_y;
@@ -145,7 +153,7 @@ void ft_set_player_start(t_system *sys, int x, int y)
 	sys->player.speed = 0.04;
 }
 
-int ft_controlMapBorder(t_system *sys)
+int ft_controlMap(t_system *sys)
 {
 	int x;
 	int y;
@@ -168,6 +176,15 @@ int ft_controlMapBorder(t_system *sys)
 				{
 					count++;
 					ft_set_player_start(sys, x, y);
+				}
+				if (sys->cub.map[y][x] == '2')
+				{
+					t_xy *pos = malloc(sizeof(t_xy));
+					pos->x = x + 0.5;
+					pos->y = y + 0.5;
+					ft_lstadd_front(&sys->cub.sprites, ft_lstnew(pos));
+					sys->cub.map[y][x] = '0';
+					sys->cub.n_sprites++;
 				}
 			}
 			x++;
@@ -226,7 +243,7 @@ void ft_controlError(t_system *sys)
 		ft_exception("Map width too small", sys);
 	if (sys->cub.map_H < 3)
 		ft_exception("Map height too small", sys);
-	ret = ft_controlMapBorder(sys);
+	ret = ft_controlMap(sys);
 	if (ret == 0)
 		ft_exception("Map border open", sys);
 	else if (ret == -2)
@@ -604,6 +621,11 @@ int ft_key_exit(t_system *sys)
 			free(sys->cub.map[i++]);
 		free(sys->cub.map);
 	}
+	if (sys->cub.sprites)
+	{
+		ft_lstclear(&sys->cub.sprites, free);
+		free(sys->cub.sprites);
+	}
 	if (sys->frame.img)
 		mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
 	if (sys->mlx_vars.win)
@@ -724,16 +746,14 @@ int ft_next_frame(t_system *sys)
 			wallX = sys->player.pos_x + wallDist * rayX;
 		wallX -= (int)wallX;
 
-		/*DISEGNA SPRITES*/
-
-		/*DISEGNA SOFFITTO*/
+		//DISEGNA SOFFITTO
 		int y = 0;
 		while (y < sys->cub.res_y / 2)
 		{
 			ft_print_pixel(x, y, sys->cub.c_rgb[0], sys->cub.c_rgb[1], sys->cub.c_rgb[2], 0, sys);
 			y++;
 		}
-		/*DISEGNA PAVIMENTO*/
+		//DISEGNA PAVIMENTO
 		while (y < sys->cub.res_y)
 		{
 			ft_print_pixel(x, y, sys->cub.f_rgb[0], sys->cub.f_rgb[1], sys->cub.f_rgb[2], 0, sys);
@@ -763,6 +783,65 @@ int ft_next_frame(t_system *sys)
 			int color = (*(int *)(texture.addr + (_y + (_x * texture.width)) * (texture.bpp / 8)));
 			texpos += wallStep;
 			ft_print_pixel_exa(x, drawstart++, color, sys);
+		}
+
+		/*DISEGNA SPRITES*/
+		double sprX;
+		double sprY;
+		double transX;
+		double transY;
+		int screenX;
+		t_list *sprite = sys->cub.sprites;
+		int s_height;
+		int s_width;
+		int s_startX;
+		int s_endX;
+		int s_startY;
+		int s_endY;
+		while (sprite)
+		{
+			// OK
+			sprX = ((t_xy *)(sprite->content))->x - sys->player.pos_x;
+			sprY = ((t_xy *)(sprite->content))->y - sys->player.pos_y;
+
+			transX = -0.83 * (sys->player.dir_y * sprX - sys->player.dir_x * sprY);
+			transY = -0.83 * (-sys->player.plane_y * sprX + sys->player.plane_x * sprY);
+
+			screenX = (int)((sys->cub.res_x / 2) * (1 + transX / transY));
+			s_width = abs((int)(sys->cub.res_y / transY));
+			s_height = s_width;
+
+			s_startX = -s_width / 2 + screenX;
+			s_endX = s_width / 2 + screenX;
+			s_startY = -s_height / 2 + sys->cub.res_y / 2;
+			s_endY = s_height / 2 + sys->cub.res_y / 2;
+
+			if (s_startX < 0)
+				s_startX = 0;
+			if (s_endX > sys->cub.res_x)
+				s_endX = sys->cub.res_x;
+			if (s_startY < 0)
+				s_startY = 0;
+			if (s_endY > sys->cub.res_y)
+				s_endY = sys->cub.res_y;
+
+			if (x >= s_startX && x < s_endX && transY > 0.1 && transY < wallDist)
+			{
+				int textX = (int)(256 * (x - (-s_width / 2 + screenX)) * sys->cub.txt_SPR.width / s_width) / 256;
+				int textY;
+				while (s_startY < s_endY)
+				{
+
+					int d = s_startY * 256 - sys->cub.res_y * 128 + s_height * 128;
+					textY = ((d * sys->cub.txt_SPR.height) / s_height) / 256;
+					int col = (*(int *)(sys->cub.txt_SPR.addr + ((textY + (textX * sys->cub.txt_SPR.width)) * (sys->cub.txt_SPR.bpp / 8))));
+					// GREEN MERDA
+					if (!(col == (int)0xFF00FF00))
+						ft_print_pixel_exa(x, s_startY, col, sys);
+					s_startY++;
+				}
+			}
+			sprite = sprite->next;
 		}
 		x++;
 	}
@@ -883,6 +962,7 @@ void ft_start_game(t_system *sys)
 	mlx_hook(sys->mlx_vars.win, 3, 0x2, ft_key_release, sys);
 	/* 33 CLIENT MESSAGE + (1L << 17) StructureNotifyMask*/
 	mlx_hook(sys->mlx_vars.win, 33, (1L << 17), ft_key_exit, sys);
+	/*START DRAWING*/
 	mlx_loop_hook(sys->mlx_vars.mlx, ft_next_frame, sys);
 	mlx_loop(sys->mlx_vars.mlx);
 }
@@ -908,6 +988,8 @@ int ft_init_system(t_system *sys)
 	sys->cub.txt_W.img = NULL;
 	sys->cub.txt_E.img = NULL;
 	sys->cub.txt_SPR.img = NULL;
+	sys->cub.n_sprites = 0;
+	sys->cub.sprites = NULL;
 	sys->player.pos_x = -1;
 	sys->player.pos_y = -1;
 	sys->player.dir_x = 0;
@@ -953,8 +1035,7 @@ int main(int argc, char **argv)
 		ft_exception("Insert a valid .cub file", &sys);
 	ft_parseFileCub(fd, &sys);
 	close(fd);
-	//ft_printCub(&sys);
-
+	/*START GAME*/
 	ft_start_game(&sys);
 	return (0);
 }
