@@ -186,7 +186,7 @@ int ft_controlMap(t_system *sys)
 		x = 0;
 		while (x < sys->cub.map_W)
 		{
-			if (sys->cub.map[y][x] == '0' || sys->cub.map[y][x] == '2' || ft_isalpha(sys->cub.map[y][x]))
+			if (sys->cub.map[y][x] == '0' || sys->cub.map[y][x] == '2' || sys->cub.map[y][x] == 'W' || sys->cub.map[y][x] == 'N' || sys->cub.map[y][x] == 'S' || sys->cub.map[y][x] == 'E')
 			{
 				if (x == 0 || y == 0 || y == sys->cub.map_H - 1 || x == sys->cub.map_W - 1)
 					return (0);
@@ -202,7 +202,7 @@ int ft_controlMap(t_system *sys)
 					t_xy *pos = malloc(sizeof(t_xy));
 					pos->x = x + 0.5;
 					pos->y = y + 0.5;
-					ft_lstadd_front(&sys->cub.sprites, ft_lstnew(pos));
+					ft_lstadd_back(&sys->cub.sprites, ft_lstnew(pos));
 					sys->cub.map[y][x] = '0';
 					sys->cub.n_sprites++;
 				}
@@ -226,14 +226,14 @@ void ft_controlError(t_system *sys)
 		ft_exception("Resolution X not valid", sys);
 	if (sys->cub.res_x > 1920)
 	{
-		ft_printf("Resize X resolution to 1920");
+		ft_printf("Resize X resolution to 1920\n");
 		sys->cub.res_x = 1920;
 	}
 	if (sys->cub.res_y <= 0)
 		ft_exception("Resolution Y not valid", sys);
 	if (sys->cub.res_y > 1080)
 	{
-		ft_printf("Resize Y resolution to 1080");
+		ft_printf("Resize Y resolution to 1080\n");
 		sys->cub.res_y = 1080;
 	}
 	if (sys->cub.txt_N.img == NULL)
@@ -316,36 +316,52 @@ int ft_ismap(char *str)
 	return (0);
 }
 
-static void ft_parseFileCub_bis(int fd, t_system *sys, t_list **list_map)
+static t_list *ft_parseFileCub_bis(int fd, t_system *sys)
 {
 	char *line;
 	char *p_line;
 	int count;
+	t_list *list_map;
 
+	list_map = NULL;
 	count = 0;
 	while ((count = ft_get_next_line(fd, &line)) > 0)
 	{
 		p_line = line;
 		if (ft_isstartmap(line))
 		{
-			if (*list_map)
+			if (list_map)
+			{
+				free(p_line);
+				ft_lstclear(&list_map, free);
 				ft_exception("Duplicated map", sys);
-			*list_map = ft_lstnew(line);
+			}
+			list_map = ft_lstnew(ft_strdup(line));
+			free(p_line);
 			while ((count = ft_get_next_line(fd, &line)) > 0)
 			{
 				if (ft_ismap(line))
-					ft_lstadd_back(&(*list_map), ft_lstnew(line));
+				{
+					ft_lstadd_back(&list_map, ft_lstnew(ft_strdup(line)));
+					free(line);
+				}
 				else
 					break;
 			}
 			if (ft_ismap(line))
-				ft_lstadd_back(&(*list_map), ft_lstnew(line));
-			break;
+			{
+				ft_lstadd_back(&list_map, ft_lstnew(ft_strdup(line)));
+			}
+			free(line);
+			return (list_map);
 		}
 		else if (line[0] == 'R' && ft_isspace(line[1]))
 		{
 			if (sys->cub.res_x != -1 && sys->cub.res_y != -1)
+			{
+				free(p_line);
 				ft_exception("Duplicated resolution", sys);
+			}
 			line++;
 			while (ft_isspace(*line))
 				line++;
@@ -355,56 +371,80 @@ static void ft_parseFileCub_bis(int fd, t_system *sys, t_list **list_map)
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.res_y = ft_atoi(line);
+			free(p_line);
 		}
 		else if (line[0] == 'N' && line[1] == 'O' && ft_isspace(line[2]))
 		{
 			if (sys->cub.txt_N.img != NULL)
+			{
+				free(p_line);
 				ft_exception("Duplicated north texture", sys);
+			}
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.txt_N.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx, line, &sys->cub.txt_N.width, &sys->cub.txt_N.height);
+			free(p_line);
 		}
 		else if (*line == 'S' && *(line + 1) == 'O' && ft_isspace(*(line + 2)))
 		{
 			if (sys->cub.txt_S.img != NULL)
+			{
+				free(p_line);
 				ft_exception("Duplicated south texture", sys);
+			}
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.txt_S.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx, line, &sys->cub.txt_S.width, &sys->cub.txt_S.height);
+			free(p_line);
 		}
 		else if (*line == 'W' && *(line + 1) == 'E' && ft_isspace(*(line + 2)))
 		{
 			if (sys->cub.txt_W.img != NULL)
+			{
+				free(p_line);
 				ft_exception("Duplicated west texture", sys);
+			}
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.txt_W.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx, line, &sys->cub.txt_W.width, &sys->cub.txt_W.height);
+			free(p_line);
 		}
 		else if (*line == 'E' && *(line + 1) == 'A' && ft_isspace(*(line + 2)))
 		{
 			if (sys->cub.txt_E.img != NULL)
+			{
+				free(p_line);
 				ft_exception("Duplicated east texture", sys);
+			}
 			line += 2;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.txt_E.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx, line, &sys->cub.txt_E.width, &sys->cub.txt_E.height);
+			free(p_line);
 		}
 		else if (*line == 'S' && ft_isspace(*(line + 1)))
 		{
 			if (sys->cub.txt_SPR.img != NULL)
+			{
+				free(p_line);
 				ft_exception("Duplicated sprite texture", sys);
+			}
 			line++;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.txt_SPR.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx, line, &sys->cub.txt_SPR.width, &sys->cub.txt_SPR.height);
+			free(p_line);
 		}
 		else if (*line == 'F' && ft_isspace(*(line + 1)))
 		{
 			if (sys->cub.f_rgb[0] != -1 && sys->cub.f_rgb[1] != -1 && sys->cub.f_rgb[2] != -1)
+			{
+				free(p_line);
 				ft_exception("Duplicated floor color", sys);
+			}
 			line++;
 			while (ft_isspace(*line))
 				line++;
@@ -414,7 +454,10 @@ static void ft_parseFileCub_bis(int fd, t_system *sys, t_list **list_map)
 			while (ft_isspace(*line))
 				line++;
 			if (*line != ',')
+			{
+				free(p_line);
 				ft_exception("Parsing floor color", sys);
+			}
 			else
 				line++;
 			while (ft_isspace(*line))
@@ -425,17 +468,24 @@ static void ft_parseFileCub_bis(int fd, t_system *sys, t_list **list_map)
 			while (ft_isspace(*line))
 				line++;
 			if (*line != ',')
+			{
+				free(p_line);
 				ft_exception("Parsing floor color", sys);
+			}
 			else
 				line++;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.f_rgb[2] = ft_atoi(line);
+			free(p_line);
 		}
 		else if (*line == 'C' && *(line + 1) == ' ')
 		{
 			if (sys->cub.c_rgb[0] != -1 && sys->cub.c_rgb[1] != -1 && sys->cub.c_rgb[2] != -1)
+			{
+				free(p_line);
 				ft_exception("Duplicated ceiling color", sys);
+			}
 			line++;
 			while (ft_isspace(*line))
 				line++;
@@ -445,7 +495,10 @@ static void ft_parseFileCub_bis(int fd, t_system *sys, t_list **list_map)
 			while (ft_isspace(*line))
 				line++;
 			if (*line != ',')
+			{
+				free(p_line);
 				ft_exception("Parsing ceiling color", sys);
+			}
 			else
 				line++;
 			while (ft_isspace(*line))
@@ -456,20 +509,31 @@ static void ft_parseFileCub_bis(int fd, t_system *sys, t_list **list_map)
 			while (ft_isspace(*line))
 				line++;
 			if (*line != ',')
+			{
+				free(p_line);
 				ft_exception("Parsing ceiling color", sys);
+			}
 			else
 				line++;
 			while (ft_isspace(*line))
 				line++;
 			sys->cub.c_rgb[2] = ft_atoi(line);
+			free(p_line);
 		}
 		else if (ft_ismap(line))
+		{
+			free(p_line);
 			ft_exception("Wrong first map line", sys);
+		}
 		else if (ft_strlen(line) > 0)
+		{
+			free(p_line);
 			ft_exception("Fake line detected", sys);
-		free(p_line);
+		}
+		else
+			free(p_line);
 	}
-	free(line);
+	return (NULL);
 }
 
 int ft_mapmaxwidth(t_list *list_map)
@@ -492,14 +556,13 @@ void ft_parseFileCub(int fd, t_system *sys)
 	t_list *list_map_temp;
 	int i;
 
-	list_map = NULL;
-	ft_parseFileCub_bis(fd, sys, &list_map);
+	list_map = ft_parseFileCub_bis(fd, sys);
+	list_map_temp = list_map;
 	sys->cub.map_H = ft_lstsize(list_map);
+	sys->cub.map_W = ft_mapmaxwidth(list_map);
 	if ((sys->cub.map = (char **)malloc((sys->cub.map_H + 1) * sizeof(char *))) == NULL)
 		ft_exception("Malloc fail during map creation (step 1)", sys);
-	sys->cub.map_W = ft_mapmaxwidth(list_map);
 	i = 0;
-	list_map_temp = list_map;
 	while (list_map)
 	{
 		if ((sys->cub.map[i] = ft_strndupfill(list_map->content, sys->cub.map_W, ' ')) == NULL)
@@ -524,14 +587,14 @@ void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_system *sys)
 {
 	int offset = (y * sys->frame.line_len + x * (sys->frame.bpp / 8));
 
-	if (sys->frame.endian == 1) //ARGB
+	if (sys->frame.endian == 1)
 	{
 		sys->frame.addr[offset + 0] = a;
 		sys->frame.addr[offset + 1] = r;
 		sys->frame.addr[offset + 2] = g;
 		sys->frame.addr[offset + 3] = b;
 	}
-	else if (sys->frame.endian == 0) //BGRA
+	else if (sys->frame.endian == 0)
 	{
 		sys->frame.addr[offset + 0] = b;
 		sys->frame.addr[offset + 1] = g;
@@ -542,7 +605,6 @@ void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_system *sys)
 
 int ft_key_press(int keycode, t_system *sys)
 {
-	//ft_printf("keycode: %d\n", keycode);
 	if (keycode == 65307 || keycode == 53)
 	{
 		if (sys->mlx_vars.win)
@@ -552,32 +614,26 @@ int ft_key_press(int keycode, t_system *sys)
 		}
 		ft_key_exit(sys);
 	}
-	//A 97
 	else if (keycode == 97 || keycode == 0)
 	{
 		sys->player.move_x = LEFT;
 	}
-	//D 100
 	else if (keycode == 100 || keycode == 2)
 	{
 		sys->player.move_x = RIGHT;
 	}
-	//W 119
 	else if (keycode == 119 || keycode == 13)
 	{
 		sys->player.move_y = UP;
 	}
-	//S 115
 	else if (keycode == 115 || keycode == 1)
 	{
 		sys->player.move_y = DOWN;
 	}
-	//<-- 65361
 	else if (keycode == 65361 || keycode == 123)
 	{
 		sys->player.move_r = R_LEFT;
 	}
-	//--> 65363
 	else if (keycode == 65363 || keycode == 124)
 	{
 		sys->player.move_r = R_RIGHT;
@@ -587,33 +643,26 @@ int ft_key_press(int keycode, t_system *sys)
 
 int ft_key_release(int keycode, t_system *sys)
 {
-	//ft_printf("keycode: %d\n", keycode);
-	//A 97
 	if ((keycode == 97 || keycode == 0) && sys->player.move_x == LEFT)
 	{
 		sys->player.move_x = 0;
 	}
-	//D 100
 	else if ((keycode == 100 || keycode == 2) && sys->player.move_x == RIGHT)
 	{
 		sys->player.move_x = 0;
 	}
-	//W 119
 	else if ((keycode == 119 || keycode == 13) && sys->player.move_y == UP)
 	{
 		sys->player.move_y = 0;
 	}
-	//S 115
 	else if ((keycode == 115 || keycode == 1) && sys->player.move_y == DOWN)
 	{
 		sys->player.move_y = 0;
 	}
-	//<-- 65361
 	else if ((keycode == 65361 || keycode == 123) && sys->player.move_r == R_LEFT)
 	{
 		sys->player.move_r = 0;
 	}
-	//--> 65363
 	else if ((keycode == 65363 || keycode == 124) && sys->player.move_r == R_RIGHT)
 	{
 		sys->player.move_r = 0;
@@ -623,6 +672,7 @@ int ft_key_release(int keycode, t_system *sys)
 
 int ft_key_exit(t_system *sys)
 {
+
 	int i;
 	if (sys->cub.txt_N.img)
 		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_N.img);
@@ -654,6 +704,7 @@ int ft_key_exit(t_system *sys)
 		mlx_destroy_display(sys->mlx_vars.mlx);
 	free(sys->mlx_vars.mlx);
 	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435\n* * * * * * * * * * * * * *\n Good bye my little friend\n* * * * * * * * * * * * * *\n");
+
 	exit(0);
 }
 
@@ -991,6 +1042,12 @@ int ft_init_system(t_system *sys)
 {
 	sys->save = 0;
 	sys->frame.img = NULL;
+	sys->frame.addr = NULL;
+	sys->frame.bpp = 0;
+	sys->frame.endian = 0;
+	sys->frame.height = 0;
+	sys->frame.width = 0;
+	sys->frame.line_len = 0;
 	sys->mlx_vars.mlx = NULL;
 	sys->mlx_vars.win = NULL;
 	sys->cub.res_x = -1;
@@ -1037,21 +1094,20 @@ int ft_is_cub_file(char *str)
 void ft_write_on_file(t_system *sys, int fd, const void *buf, ssize_t len)
 {
 	if (write(fd, buf, len) != len)
-	{
 		ft_exception("Fail write on bmp file", sys);
-	}
 }
 
-int ft_save_frame(t_system *sys)
+void ft_save_frame(t_system *sys)
 {
 	int fd;
 	int i;
 	unsigned int *line;
 	t_bmp bmp;
 
+	sys->save = 1;
 	sys->frame.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
 	sys->frame.addr = mlx_get_data_addr(sys->frame.img, &sys->frame.bpp, &sys->frame.line_len, &sys->frame.endian);
-
+	ft_memset(&bmp, 0, sizeof(t_bmp));
 	bmp.tot_size = (sys->cub.res_x * sys->cub.res_y * (sys->frame.bpp / 8)) + 54;
 	bmp.pixel_offset = 54;
 	bmp.h_size = 40;
@@ -1060,7 +1116,6 @@ int ft_save_frame(t_system *sys)
 	bmp.planes = 1;
 	bmp.bpp = sys->frame.bpp;
 	bmp.img_size = sys->cub.res_x * sys->cub.res_y * (sys->frame.bpp / 8);
-	sys->save = 1;
 
 	ft_next_frame(sys);
 	fd = open("screenshot.bmp", O_CREAT | O_WRONLY | O_TRUNC, 0666);
@@ -1077,7 +1132,6 @@ int ft_save_frame(t_system *sys)
 	}
 	if (close(fd) == -1)
 		ft_exception("Can't close bmp file", sys);
-	return (0);
 }
 
 int main(int argc, char **argv)

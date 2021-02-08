@@ -81,7 +81,6 @@ int mlx_ext_fullscreen(t_xvar *xvar, t_win_list *win, int fullscreen)
 
 	if (fullscreen)
 	{
-		//      XGrabPointer(xvar->display, win->window, True, 0, GrabModeAsync, GrabModeAsync, win->window, 0L, CurrentTime);
 		XGrabKeyboard(xvar->display, win->window, False, GrabModeAsync, GrabModeAsync, CurrentTime);
 	}
 	else

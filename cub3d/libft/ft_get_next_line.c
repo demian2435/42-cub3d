@@ -51,10 +51,9 @@ static int	ft_return(int code, char *arr, char *line_new, char **line)
 {
 	if (code == 0 || code == -1)
 		ft_clear(arr);
-	if (code == -1)
-		free(line_new);
 	if (code == 0 || code == 1)
-		*line = line_new;
+		*line = ft_strdup(line_new);
+	free(line_new);
 	return (code);
 }
 
