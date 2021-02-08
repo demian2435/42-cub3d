@@ -14,6 +14,7 @@
 #include "mlx.h"
 #include "libft.h"
 #include <math.h>
+#include <stdio.h>
 
 #define R_LEFT 10
 #define R_RIGHT 20
@@ -21,6 +22,25 @@
 #define RIGHT 40
 #define UP 50
 #define DOWN 60
+
+typedef struct s_bmp
+{
+	unsigned int tot_size;
+	unsigned short res1;
+	unsigned short res2;
+	unsigned int pixel_offset;
+	unsigned int h_size;
+	unsigned int w;
+	unsigned int h;
+	unsigned short planes;
+	unsigned short bpp;
+	unsigned int compression;
+	unsigned int img_size;
+	unsigned int xppm;
+	unsigned int yppm;
+	unsigned int tot_colors;
+	unsigned int imp_colors;
+} t_bmp;
 
 typedef struct s_xy
 {
@@ -83,7 +103,7 @@ typedef struct s_system
 	t_img_data frame;
 	t_mlx_vars mlx_vars;
 	t_player player;
-
+	int save;
 } t_system;
 
 void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_system *sys);
@@ -944,8 +964,8 @@ int ft_next_frame(t_system *sys)
 			sys->player.pos_y = new_y;
 		}
 	}
-
-	mlx_put_image_to_window(sys->mlx_vars.mlx, sys->mlx_vars.win, sys->frame.img, 0, 0);
+	if (sys->save == 0)
+		mlx_put_image_to_window(sys->mlx_vars.mlx, sys->mlx_vars.win, sys->frame.img, 0, 0);
 	return (0);
 }
 
@@ -969,6 +989,7 @@ void ft_start_game(t_system *sys)
 
 int ft_init_system(t_system *sys)
 {
+	sys->save = 0;
 	sys->frame.img = NULL;
 	sys->mlx_vars.mlx = NULL;
 	sys->mlx_vars.win = NULL;
@@ -1013,6 +1034,52 @@ int ft_is_cub_file(char *str)
 	return (!ft_strcmp(str + (len - 4), ".cub"));
 }
 
+void ft_write_on_file(t_system *sys, int fd, const void *buf, ssize_t len)
+{
+	if (write(fd, buf, len) != len)
+	{
+		ft_exception("Fail write on bmp file", sys);
+	}
+}
+
+int ft_save_frame(t_system *sys)
+{
+	int fd;
+	int i;
+	unsigned int *line;
+	t_bmp bmp;
+
+	sys->frame.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
+	sys->frame.addr = mlx_get_data_addr(sys->frame.img, &sys->frame.bpp, &sys->frame.line_len, &sys->frame.endian);
+
+	bmp.tot_size = (sys->cub.res_x * sys->cub.res_y * (sys->frame.bpp / 8)) + 54;
+	bmp.pixel_offset = 54;
+	bmp.h_size = 40;
+	bmp.w = sys->cub.res_x;
+	bmp.h = sys->cub.res_y;
+	bmp.planes = 1;
+	bmp.bpp = sys->frame.bpp;
+	bmp.img_size = sys->cub.res_x * sys->cub.res_y * (sys->frame.bpp / 8);
+	sys->save = 1;
+
+	ft_next_frame(sys);
+	fd = open("screenshot.bmp", O_CREAT | O_WRONLY | O_TRUNC, 0666);
+	if (fd < 0)
+		ft_exception("Can't open/create screenshot file", sys);
+	ft_write_on_file(sys, fd, "BM", 2);
+	ft_write_on_file(sys, fd, &bmp, sizeof(bmp));
+	i = 0;
+	while (i < sys->cub.res_y)
+	{
+		line = (unsigned int *)&sys->frame.addr[(sys->cub.res_y - i - 1) * sys->frame.line_len];
+		ft_write_on_file(sys, fd, line, sys->frame.line_len);
+		i++;
+	}
+	if (close(fd) == -1)
+		ft_exception("Can't close bmp file", sys);
+	return (0);
+}
+
 int main(int argc, char **argv)
 {
 	t_system sys;
@@ -1029,12 +1096,22 @@ int main(int argc, char **argv)
 
 	/* PARSING map */
 	if (!ft_is_cub_file(argv[1]))
-		ft_exception("Not insert a .cub file", &sys);
+		ft_exception("Not .cub file selected", &sys);
 	int fd = open(argv[1], O_RDONLY);
 	if (fd == -1)
 		ft_exception("Insert a valid .cub file", &sys);
 	ft_parseFileCub(fd, &sys);
-	close(fd);
+	if (close(fd) == -1)
+		ft_exception("Can't close cub file", &sys);
+	/*SCREENSHOT*/
+	if (argc == 3)
+	{
+		if (!ft_strcmp(argv[2], "--save"))
+			ft_save_frame(&sys);
+		else
+			ft_exception("Command not found", &sys);
+		ft_key_exit(&sys);
+	}
 	/*START GAME*/
 	ft_start_game(&sys);
 	return (0);

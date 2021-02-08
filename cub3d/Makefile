@@ -62,7 +62,19 @@ v: ${NAME}
 	--track-origins=yes \
 	--verbose \
 	--verbose \
-	--log-file=./extra/valgrind-out.txt \
-	./${NAME} ${MAP} && cat ./extra/valgrind-out.txt
+	--log-file=./valgrind-out.txt \
+	./${NAME} ${MAP} && cat ./valgrind-out.txt
 
-.PHONY: all clean fclean re mlx ft run v
+v_save: ${NAME}
+	valgrind --leak-check=full \
+	--show-leak-kinds=all \
+	--track-origins=yes \
+	--verbose \
+	--verbose \
+	--log-file=./valgrind-out.txt \
+	./${NAME} ${MAP} --save && cat ./valgrind-out.txt
+
+save:  ${NAME}
+		./${NAME} ${MAP} --save
+
+.PHONY: all clean fclean re mlx ft run v save v_save
