@@ -1,80 +1,94 @@
-OS			= $(shell uname)
+OS			=	$(shell uname)
 
-NAME		= Cub3D
+NAME		=	Cub3D
 
-MAP			= ./maps/map.cub
+MAP			=	./maps/map.cub
 
-CC			= gcc
+CC			=	gcc
 
-OPT			= -O3
+OPT			=	-O3
 
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror
 
-SRCS		= main.c
+SRCS		=	main.c \
+				main_bis.c \
+				control.c \
+				frame.c \
+				parse.c \
+				utils.c \
+				sprite.c \
+				keys.c \
+				player.c \
+				print.c
 
-OBJS		= ${SRCS:.c=.o}
+OBJS		=	${SRCS:.c=.o}
 
 ifeq ($(OS), Linux)
-	MLX_DIR	= minilibx-linux
-	MLX_LNK	= -L ${MLX_DIR} -lmlx -lXext -lX11 -lbsd
+MLX_DIR		=	minilibx-linux
+MLX_LNK		=	-L ${MLX_DIR} -lmlx -lXext -lX11 -lbsd -lm
 else
-	MLX_DIR	= minilibx-mac
-	MLX_LNK	= -L ${MLX_DIR} -lmlx -framework OpenGL -framework AppKit
+MLX_DIR		=	minilibx-mac
+MLX_LNK		=	-L ${MLX_DIR} -lmlx -framework OpenGL -framework AppKit -lm
 endif
 
-FT_DIR = libft
-FT_LNK = -L ${FT_DIR} -lft
+FT_DIR 		=	libft
+FT_LNK 		=	-L ${FT_DIR} -lft
 
-INC = -I $(FT_DIR) -I $(MLX_DIR)
+INC 		=	-I $(FT_DIR) -I $(MLX_DIR)
 
 .c.o:
-	${CC} ${CFLAGS} -c $< -o ${<:.c=.o} ${INC}
+			${CC} ${CFLAGS} -c $< -o ${<:.c=.o} ${INC}
 
-${NAME}: ${OBJS} ft mlx
-		${CC} ${OPT} ${CFLAGS} ${INC} ${OBJS} ${FT_LNK} ${MLX_LNK} -o ${NAME}
+${NAME}: 	${OBJS} ft mlx
+			${CC} ${OPT} ${CFLAGS} ${INC} ${OBJS} ${FT_LNK} ${MLX_LNK} -o ${NAME}
 
+ifeq ($(OS), Linux)
 mlx:
-	make -C ${MLX_DIR}
-	mv ${MLX_DIR}/libmlx.dylib .
+			make -C ${MLX_DIR}
+else
+mlx:
+			make -C ${MLX_DIR}
+			mv ${MLX_DIR}/libmlx.dylib .
+endif
 
 ft:
-	make -C ${FT_DIR}
+			make -C ${FT_DIR}
 
-all: ${NAME}
+all: 		${NAME}
 
 clean:
-	rm -f ${OBJS}
+			rm -f ${OBJS}
 
-fclean: clean
-	make fclean -C ${FT_DIR}
-	make clean -C ${MLX_DIR}
-	rm -f ${NAME}
-	rm -f libmlx.dylib
+fclean: 	clean
+			make fclean -C ${FT_DIR}
+			make clean -C ${MLX_DIR}
+			rm -f ${NAME}
+			rm -f libmlx.dylib
 
-re: fclean all
+re: 		fclean all
 
-run: ${NAME}
-		./${NAME} ${MAP}
+run: 		${NAME}
+			./${NAME} ${MAP}
 
-v: ${NAME}
-	valgrind --leak-check=full \
-	--show-leak-kinds=all \
-	--track-origins=yes \
-	--verbose \
-	--verbose \
-	--log-file=./valgrind-out.txt \
-	./${NAME} ${MAP} && cat ./valgrind-out.txt
+v: 			${NAME}
+			valgrind --leak-check=full \
+			--show-leak-kinds=all \
+			--track-origins=yes \
+			--verbose \
+			--verbose \
+			--log-file=./valgrind-out.txt \
+			./${NAME} ${MAP} && cat ./valgrind-out.txt
 
-v_save: ${NAME}
-	valgrind --leak-check=full \
-	--show-leak-kinds=all \
-	--track-origins=yes \
-	--verbose \
-	--verbose \
-	--log-file=./valgrind-out.txt \
-	./${NAME} ${MAP} --save && cat ./valgrind-out.txt
+v_save: 	${NAME}
+			valgrind --leak-check=full \
+			--show-leak-kinds=all \
+			--track-origins=yes \
+			--verbose \
+			--verbose \
+			--log-file=./valgrind-out.txt \
+			./${NAME} ${MAP} --save && cat ./valgrind-out.txt
 
-save:  ${NAME}
-		./${NAME} ${MAP} --save
+save:  		${NAME}
+			./${NAME} ${MAP} --save
 
-.PHONY: all clean fclean re mlx ft run v save v_save
+.PHONY: 	all clean fclean re mlx ft run v save v_save
