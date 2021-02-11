@@ -35,7 +35,7 @@ ${NAME}: ${OBJS} ft mlx
 
 mlx:
 	make -C ${MLX_DIR}
-	#mv ${MLX_DIR}/libmlx.dylib .
+	mv ${MLX_DIR}/libmlx.dylib .
 
 ft:
 	make -C ${FT_DIR}

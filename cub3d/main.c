@@ -6,108 +6,11 @@
 /*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 18:38:52 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/04 19:12:41 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/11 19:22:34 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
-#include "mlx.h"
-#include "libft.h"
-#include <math.h>
-#include <stdio.h>
-
-#define R_LEFT 10
-#define R_RIGHT 20
-#define LEFT 30
-#define RIGHT 40
-#define UP 50
-#define DOWN 60
-
-typedef struct s_bmp
-{
-	unsigned int tot_size;
-	unsigned short res1;
-	unsigned short res2;
-	unsigned int pixel_offset;
-	unsigned int h_size;
-	unsigned int w;
-	unsigned int h;
-	unsigned short planes;
-	unsigned short bpp;
-	unsigned int compression;
-	unsigned int img_size;
-	unsigned int xppm;
-	unsigned int yppm;
-	unsigned int tot_colors;
-	unsigned int imp_colors;
-} t_bmp;
-
-typedef struct s_xy
-{
-	double x;
-	double y;
-} t_xy;
-
-typedef struct s_img_data
-{
-	void *img;
-	char *addr;
-	int bpp;
-	int line_len;
-	int endian;
-	int width;
-	int height;
-} t_img_data;
-
-typedef struct s_cub
-{
-	int res_x;
-	int res_y;
-	t_img_data txt_N;
-	t_img_data txt_S;
-	t_img_data txt_W;
-	t_img_data txt_E;
-	t_img_data txt_SPR;
-	int n_sprites;
-	t_list *sprites;
-	int f_rgb[3];
-	int c_rgb[3];
-	char **map;
-	int map_W;
-	int map_H;
-} t_cub;
-
-typedef struct s_mlx_vars
-{
-	void *mlx;
-	void *win;
-} t_mlx_vars;
-
-typedef struct s_player
-{
-	double pos_x;
-	double pos_y;
-	double dir_x;
-	double dir_y;
-	double plane_x;
-	double plane_y;
-	double speed;
-	int move_y;
-	int move_x;
-	int move_r;
-} t_player;
-
-typedef struct s_system
-{
-	t_cub cub;
-	t_img_data frame;
-	t_mlx_vars mlx_vars;
-	t_player player;
-	int save;
-} t_system;
-
-void ft_print_pixel(int x, int y, int r, int g, int b, int a, t_system *sys);
-int ft_key_exit(t_system *sys);
+#include "cub3d.h"
 
 void ft_exception(char *str, t_system *sys)
 {
@@ -607,11 +510,13 @@ int ft_key_press(int keycode, t_system *sys)
 {
 	if (keycode == 65307 || keycode == 53)
 	{
+		/* NO MAC
 		if (sys->mlx_vars.win)
 		{
 			mlx_destroy_window(sys->mlx_vars.mlx, sys->mlx_vars.win);
 			sys->mlx_vars.win = NULL;
 		}
+		*/
 		ft_key_exit(sys);
 	}
 	else if (keycode == 97 || keycode == 0)
@@ -696,16 +601,54 @@ int ft_key_exit(t_system *sys)
 		ft_lstclear(&sys->cub.sprites, free);
 		free(sys->cub.sprites);
 	}
-	if (sys->frame.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
+	//if (sys->frame.img)
+		//mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
 	if (sys->mlx_vars.win)
 		free(sys->mlx_vars.win);
-	if (sys->mlx_vars.mlx)
-		mlx_destroy_display(sys->mlx_vars.mlx);
+	//NO MAC
+	//if (sys->mlx_vars.mlx)
+	//	mlx_destroy_display(sys->mlx_vars.mlx);
 	free(sys->mlx_vars.mlx);
 	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435\n* * * * * * * * * * * * * *\n Good bye my little friend\n* * * * * * * * * * * * * *\n");
 
 	exit(0);
+}
+
+void ft_sprites_calc_dist(t_list **lst, t_system *sys)
+{
+	t_list *start = *lst;
+	while(start)
+	{
+		t_xy *s = (t_xy *)start->content;
+		s->_x = sys->player.pos_x - s->x;
+		s->_y = sys->player.pos_x - s->y;
+		s->dist = sqrt(s->_x * s->_x + s->_y * s->_y);
+		start = start->next;
+	}
+}
+
+void ft_sprites_sort(t_list **lst)
+{
+    t_list *node = NULL;
+	t_list *temp = NULL;
+    t_xy *tempvar;
+	
+    node = *lst;
+    while(node != NULL)
+    {
+        temp = node; 
+        while (temp->next !=NULL)
+        {
+           if(((t_xy *)temp->content)->dist < ((t_xy *)temp->next->content)->dist)
+            {
+              tempvar = temp->content;
+              temp->content = temp->next->content;
+              temp->next->content = tempvar;
+            }
+         temp = temp->next;
+        }
+        node = node->next;
+    }
 }
 
 int ft_next_frame(t_system *sys)
@@ -725,6 +668,9 @@ int ft_next_frame(t_system *sys)
 	double sideY;
 	int hit;
 
+
+	sys->frame.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
+	sys->frame.addr = mlx_get_data_addr(sys->frame.img, &sys->frame.bpp, &sys->frame.line_len, &sys->frame.endian);
 	/*GESTIRE SPRITE*/
 	x = 0;
 	while (x < sys->cub.res_x)
@@ -795,7 +741,7 @@ int ft_next_frame(t_system *sys)
 			}
 		}
 
-		double wallDist;
+		double wallDist = 0;
 		double wallX;
 
 		if (side == 0)
@@ -869,14 +815,17 @@ int ft_next_frame(t_system *sys)
 		int s_endX;
 		int s_startY;
 		int s_endY;
+		ft_sprites_calc_dist(&sprite, sys);
+		ft_sprites_sort(&sprite);
 		while (sprite)
 		{
 			// OK
 			sprX = ((t_xy *)(sprite->content))->x - sys->player.pos_x;
 			sprY = ((t_xy *)(sprite->content))->y - sys->player.pos_y;
 
-			transX = -0.83 * (sys->player.dir_y * sprX - sys->player.dir_x * sprY);
-			transY = -0.83 * (-sys->player.plane_y * sprX + sys->player.plane_x * sprY);
+			double test = 1.0 / (sys->player.plane_x * sys->player.dir_y - sys->player.dir_x * sys->player.plane_y);
+			transX = test * (sys->player.dir_y * sprX - sys->player.dir_x * sprY);
+			transY = test * (-sys->player.plane_y * sprX + sys->player.plane_x * sprY);
 
 			screenX = (int)((sys->cub.res_x / 2) * (1 + transX / transY));
 			s_width = abs((int)(sys->cub.res_y / transY));
@@ -906,16 +855,18 @@ int ft_next_frame(t_system *sys)
 					int d = s_startY * 256 - sys->cub.res_y * 128 + s_height * 128;
 					textY = ((d * sys->cub.txt_SPR.height) / s_height) / 256;
 					int col = (*(int *)(sys->cub.txt_SPR.addr + ((textY + (textX * sys->cub.txt_SPR.width)) * (sys->cub.txt_SPR.bpp / 8))));
-					// GREEN MERDA
-					if (!(col == (int)0xFF00FF00))
+					// GREEN MERDA (MAC)
+					if ((unsigned int)col != 0x0000FF00)
 						ft_print_pixel_exa(x, s_startY, col, sys);
 					s_startY++;
 				}
 			}
 			sprite = sprite->next;
 		}
+			
 		x++;
 	}
+
 	/*MOVIMENTO PLAYER*/
 	if (sys->player.move_r == R_LEFT)
 	{
@@ -961,7 +912,7 @@ int ft_next_frame(t_system *sys)
 		new_dir_x = olddirx;
 		new_dir_y = olddiry;
 
-		if (sys->cub.map[(int)new_pos_y][(int)new_pos_x] == '0' || sys->cub.map[(int)new_pos_y][(int)new_pos_x] == '2')
+		if (sys->cub.map[(int)new_pos_y][(int)new_pos_x] == '0')
 		{
 			sys->player.pos_x = new_pos_x;
 			sys->player.pos_y = new_pos_y;
@@ -987,7 +938,7 @@ int ft_next_frame(t_system *sys)
 		new_dir_x = olddirx;
 		new_dir_y = olddiry;
 
-		if (sys->cub.map[(int)new_pos_y][(int)new_pos_x] == '0' || sys->cub.map[(int)new_pos_y][(int)new_pos_x] == '2')
+		if (sys->cub.map[(int)new_pos_y][(int)new_pos_x] == '0')
 		{
 			sys->player.pos_x = new_pos_x;
 			sys->player.pos_y = new_pos_y;
@@ -999,7 +950,7 @@ int ft_next_frame(t_system *sys)
 	{
 		double new_x = sys->player.pos_x + sys->player.dir_x * sys->player.speed;
 		double new_y = sys->player.pos_y + sys->player.dir_y * sys->player.speed;
-		if (sys->cub.map[(int)new_y][(int)new_x] == '0' || sys->cub.map[(int)new_y][(int)new_x] == '2')
+		if (sys->cub.map[(int)new_y][(int)new_x] == '0')
 		{
 			sys->player.pos_x = new_x;
 			sys->player.pos_y = new_y;
@@ -1009,22 +960,23 @@ int ft_next_frame(t_system *sys)
 	{
 		double new_x = sys->player.pos_x - sys->player.dir_x * sys->player.speed;
 		double new_y = sys->player.pos_y - sys->player.dir_y * sys->player.speed;
-		if (sys->cub.map[(int)new_y][(int)new_x] == '0' || sys->cub.map[(int)new_y][(int)new_x] == '2')
+		if (sys->cub.map[(int)new_y][(int)new_x] == '0')
 		{
 			sys->player.pos_x = new_x;
 			sys->player.pos_y = new_y;
 		}
 	}
 	if (sys->save == 0)
+	{
 		mlx_put_image_to_window(sys->mlx_vars.mlx, sys->mlx_vars.win, sys->frame.img, 0, 0);
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
+	}
 	return (0);
 }
 
 void ft_start_game(t_system *sys)
 {
 	sys->mlx_vars.win = mlx_new_window(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y, "Cub3D D2435");
-	sys->frame.img = mlx_new_image(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y);
-	sys->frame.addr = mlx_get_data_addr(sys->frame.img, &sys->frame.bpp, &sys->frame.line_len, &sys->frame.endian);
 
 	mlx_do_key_autorepeaton(sys->mlx_vars.mlx);
 	/* 2 BOTTONE PREMUTO + 0x1 mask BOTTONE PREMUTO*/
