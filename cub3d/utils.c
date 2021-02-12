@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/12 23:26:11 by d2435             #+#    #+#             */
+/*   Updated: 2021/02/12 23:26:16 by d2435            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-void ft_exception(char *str, t_system *sys)
+void	ft_exception(char *str, t_system *sys)
 {
 	ft_printf("Error\n%s\n", str);
 	ft_key_exit(sys);
 }
 
-int ft_isSpaceNear(char **map, int x, int y)
+int		ft_isspacenear(char **map, int x, int y)
 {
 	if (map[y][x + 1] == ' ')
 		return (1);
@@ -27,7 +39,7 @@ int ft_isSpaceNear(char **map, int x, int y)
 	return (0);
 }
 
-int ft_isstartmap(char *str)
+int		ft_isstartmap(char *str)
 {
 	int walls;
 
@@ -49,14 +61,15 @@ int ft_isstartmap(char *str)
 	return (0);
 }
 
-int ft_ismap(char *str)
+int		ft_ismap(char *str)
 {
 	int walls;
 
 	walls = 0;
 	while (*str)
 	{
-		if (*str == ' ' || *str == '0' || *str == '2' || *str == 'N' || *str == 'S' || *str == 'W' || *str == 'E')
+		if (*str == ' ' || *str == '0' || *str == '2' ||
+			*str == 'N' || *str == 'S' || *str == 'W' || *str == 'E')
 			str++;
 		else if (*str == '1')
 		{
@@ -71,7 +84,7 @@ int ft_ismap(char *str)
 	return (0);
 }
 
-int ft_isCubFile(char *str)
+int		ft_iscubfile(char *str)
 {
 	int len;
 

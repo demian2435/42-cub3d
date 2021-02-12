@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   keys.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/12 23:27:23 by d2435             #+#    #+#             */
+/*   Updated: 2021/02/12 23:27:24 by d2435            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-int ft_key_press(int keycode, t_system *sys)
+int		ft_key_press(int keycode, t_system *sys)
 {
 	if (keycode == 65307 || keycode == 53)
 		ft_key_exit(sys);
@@ -19,7 +31,7 @@ int ft_key_press(int keycode, t_system *sys)
 	return (0);
 }
 
-int ft_key_release(int keycode, t_system *sys)
+int		ft_key_release(int keycode, t_system *sys)
 {
 	if ((keycode == 97 || keycode == 0) && sys->player.move_x == LEFT)
 		sys->player.move_x = 0;
@@ -29,14 +41,16 @@ int ft_key_release(int keycode, t_system *sys)
 		sys->player.move_y = 0;
 	else if ((keycode == 115 || keycode == 1) && sys->player.move_y == DOWN)
 		sys->player.move_y = 0;
-	else if ((keycode == 65361 || keycode == 123) && sys->player.move_r == R_LEFT)
+	else if ((keycode == 65361 || keycode == 123) &&
+		sys->player.move_r == R_LEFT)
 		sys->player.move_r = 0;
-	else if ((keycode == 65363 || keycode == 124) && sys->player.move_r == R_RIGHT)
+	else if ((keycode == 65363 || keycode == 124) &&
+		sys->player.move_r == R_RIGHT)
 		sys->player.move_r = 0;
 	return (0);
 }
 
-void ft_clean_struct(t_system *sys)
+void	ft_clean_struct(t_system *sys)
 {
 	int i;
 
@@ -54,7 +68,7 @@ void ft_clean_struct(t_system *sys)
 	}
 }
 
-int ft_key_exit(t_system *sys)
+int		ft_key_exit(t_system *sys)
 {
 	if (sys->cub.txt_N.img)
 		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_N.img);
@@ -72,7 +86,8 @@ int ft_key_exit(t_system *sys)
 	if (sys->mlx_vars.mlx)
 		mlx_destroy_display(sys->mlx_vars.mlx);
 	free(sys->mlx_vars.mlx);
-	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435\n* * * * * * * * * * * * * *");
+	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435");
+	ft_printf("\n* * * * * * * * * * * * * *");
 	ft_printf("\n Good bye my little friend\n* * * * * * * * * * * * * *\n");
 	exit(0);
 }

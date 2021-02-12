@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   save.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/12 23:26:40 by d2435             #+#    #+#             */
+/*   Updated: 2021/02/12 23:26:41 by d2435            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-void ft_start_save(char *str, t_system *sys)
+void	ft_start_save(char *str, t_system *sys)
 {
 	if (!ft_strcmp(str, "--save"))
 		ft_save_frame(sys);
@@ -9,12 +21,12 @@ void ft_start_save(char *str, t_system *sys)
 	ft_key_exit(sys);
 }
 
-void ft_save_frame(t_system *sys)
+void	ft_save_frame(t_system *sys)
 {
-	int fd;
-	int i;
-	unsigned int *line;
-	t_bmp bmp;
+	int				fd;
+	int				i;
+	unsigned int	*line;
+	t_bmp			bmp;
 
 	sys->save = 1;
 	ft_next_frame(sys);
@@ -28,7 +40,8 @@ void ft_save_frame(t_system *sys)
 	i = 0;
 	while (i < sys->cub.res_y)
 	{
-		line = (unsigned int *)&sys->frame.addr[(sys->cub.res_y - i++ - 1) * sys->frame.line_len];
+		line = (unsigned int *)&sys->frame.addr[(sys->cub.res_y - i++ - 1) *
+			sys->frame.line_len];
 		ft_write_on_file(sys, fd, line, sys->frame.line_len);
 	}
 	if (close(fd) == -1)
@@ -36,15 +49,16 @@ void ft_save_frame(t_system *sys)
 	mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
 }
 
-void ft_write_on_file(t_system *sys, int fd, const void *buf, ssize_t len)
+void	ft_write_on_file(t_system *sys, int fd, const void *buf, ssize_t len)
 {
 	if (write(fd, buf, len) != len)
 		ft_exception("Fail write on bmp file", sys);
 }
 
-void ft_init_bpm(t_system *sys, t_bmp *bmp)
+void	ft_init_bpm(t_system *sys, t_bmp *bmp)
 {
-	bmp->tot_size = (sys->cub.res_x * sys->cub.res_y * (sys->frame.bpp / 8)) + 54;
+	bmp->tot_size = (sys->cub.res_x * sys->cub.res_y *
+		(sys->frame.bpp / 8)) + 54;
 	bmp->pixel_offset = 54;
 	bmp->h_size = 40;
 	bmp->w = sys->cub.res_x;
@@ -54,7 +68,7 @@ void ft_init_bpm(t_system *sys, t_bmp *bmp)
 	bmp->img_size = sys->cub.res_x * sys->cub.res_y * (sys->frame.bpp / 8);
 }
 
-int ft_mapmaxwidth(t_list *list_map)
+int		ft_mapmaxwidth(t_list *list_map)
 {
 	size_t max;
 

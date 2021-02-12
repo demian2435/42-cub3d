@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-static void					ft_clear(char *arr)
+static void	ft_clear(char *arr)
 {
 	int					i;
 
@@ -57,7 +57,7 @@ static int	ft_return(int code, char *arr, char *line_new, char **line)
 	return (code);
 }
 
-int	ft_get_next_line(int fd, char **line)
+int			ft_get_next_line(int fd, char **line)
 {
 	static char		arr[MAX_FILES][BUFFER_SIZE];
 	char			*line_new;

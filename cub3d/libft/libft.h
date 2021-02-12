@@ -18,8 +18,6 @@
 # include <unistd.h>
 # include <stdarg.h>
 
-typedef enum { FALSE, TRUE} BOOL;
-
 typedef struct		s_list
 {
 	void			*content;

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cub3d.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/12 23:27:39 by d2435             #+#    #+#             */
+/*   Updated: 2021/02/12 23:29:52 by d2435            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 
 #ifndef CUB3D_H
 #define CUB3D_H
@@ -119,6 +131,7 @@ typedef struct s_cub
 
 typedef struct s_parse
 {
+	int find;
 	char *line;
 	char *line_tmp;
 	int count;
@@ -162,7 +175,7 @@ typedef struct s_system
 } t_system;
 
 void ft_exception(char *str, t_system *sys);
-int ft_isSpaceNear(char **map, int x, int y);
+int ft_isspacenear(char **map, int x, int y);
 void ft_init_player_dir(t_system *sys, char dir);
 void ft_set_player_start(t_system *sys, int x, int y);
 void ft_add_sprite(t_system *sys, int x, int y);
@@ -174,14 +187,14 @@ void ft_control_errors(t_system *sys);
 int ft_isstartmap(char *str);
 int ft_ismap(char *str);
 int ft_mapmaxwidth(t_list *list_map);
-void ft_parseFileCub(int fd, t_system *sys);
+void ft_parse_cub(int fd, t_system *sys);
 void ft_print_pixel_exa(int x, int y, int color, t_system *sys);
 int ft_key_press(int keycode, t_system *sys);
 int ft_key_release(int keycode, t_system *sys);
 void ft_sprites_calc_dist(t_list **lst, t_system *sys);
 void ft_sprites_sort(t_list **lst);
 void ft_start_game(t_system *sys);
-int ft_isCubFile(char *str);
+int ft_iscubfile(char *str);
 void ft_write_on_file(t_system *sys, int fd, const void *buf, ssize_t len);
 void ft_init_bpm(t_system *sys, t_bmp *bmp);
 void ft_save_frame(t_system *sys);
@@ -208,13 +221,13 @@ void ft_clean_struct(t_system *sys);
 int ft_key_exit(t_system *sys);
 void ft_parse_resolution(t_system *sys);
 void ft_parse_map(int fd, t_system *sys);
-void ft_parse_texture_N(t_system *sys);
-void ft_parse_texture_S(t_system *sys);
-void ft_parse_texture_W(t_system *sys);
-void ft_parse_texture_E(t_system *sys);
+void ft_parse_texture_n(t_system *sys);
+void ft_parse_texture_s(t_system *sys);
+void ft_parse_texture_w(t_system *sys);
+void ft_parse_texture_e(t_system *sys);
 void ft_parse_floor(t_system *sys);
 void ft_parse_ceiling(t_system *sys);
 void ft_skip_spaces(t_system *sys);
 void ft_parse_texture_spr(t_system *sys);
-void ft_parseFileCub_bis(int fd, t_system *sys);
+void ft_parse_cub_bis(int fd, t_system *sys);
 #endif

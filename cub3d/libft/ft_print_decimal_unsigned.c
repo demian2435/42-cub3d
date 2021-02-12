@@ -12,7 +12,8 @@
 
 #include "libft.h"
 
-static int		ft_print_decimal_unsigned_bis(t_flags *flags, char *num, int len)
+static int		ft_print_decimal_unsigned_bis(
+	t_flags *flags, char *num, int len)
 {
 	int count;
 

@@ -12,9 +12,10 @@
 
 #include "cub3d.h"
 
-void ft_start_game(t_system *sys)
+void	ft_start_game(t_system *sys)
 {
-	sys->mlx_vars.win = mlx_new_window(sys->mlx_vars.mlx, sys->cub.res_x, sys->cub.res_y, "Cub3D D2435");
+	sys->mlx_vars.win = mlx_new_window(sys->mlx_vars.mlx,
+		sys->cub.res_x, sys->cub.res_y, "Cub3D D2435");
 	mlx_do_key_autorepeaton(sys->mlx_vars.mlx);
 	mlx_hook(sys->mlx_vars.win, 2, 0x1, ft_key_press, sys);
 	mlx_hook(sys->mlx_vars.win, 3, 0x2, ft_key_release, sys);
@@ -23,7 +24,7 @@ void ft_start_game(t_system *sys)
 	mlx_loop(sys->mlx_vars.mlx);
 }
 
-void ft_init_system(t_system *sys)
+void	ft_init_system(t_system *sys)
 {
 	sys->mlx_vars.mlx = mlx_init();
 	sys->cub.res_x = -1;
@@ -41,21 +42,23 @@ void ft_init_system(t_system *sys)
 	mlx_get_screen_size(sys->mlx_vars.mlx, &sys->max_x, &sys->max_y);
 }
 
-void ft_parseFileCub(int fd, t_system *sys)
+void	ft_parse_cub(int fd, t_system *sys)
 {
-	t_list *list_map_temp;
-	int i;
+	t_list	*list_map_temp;
+	int		i;
 
-	ft_parseFileCub_bis(fd, sys);
+	ft_parse_cub_bis(fd, sys);
 	list_map_temp = sys->parse.list_map;
 	sys->cub.map_H = ft_lstsize(list_map_temp);
 	sys->cub.map_W = ft_mapmaxwidth(list_map_temp);
-	if ((sys->cub.map = (char **)malloc((sys->cub.map_H + 1) * sizeof(char *))) == NULL)
+	if ((sys->cub.map = (char **)malloc((sys->cub.map_H + 1) *
+		sizeof(char *))) == NULL)
 		ft_exception("Malloc fail during map creation (step 1)", sys);
 	i = 0;
 	while (list_map_temp)
 	{
-		if ((sys->cub.map[i] = ft_strndupfill(list_map_temp->content, sys->cub.map_W, ' ')) == NULL)
+		if ((sys->cub.map[i] = ft_strndupfill(list_map_temp->content,
+			sys->cub.map_W, ' ')) == NULL)
 			ft_exception("Malloc fail during map creation (step 2)", sys);
 		list_map_temp = list_map_temp->next;
 		i++;
@@ -65,9 +68,10 @@ void ft_parseFileCub(int fd, t_system *sys)
 	ft_control_errors(sys);
 }
 
-int main(int argc, char **argv)
+int		main(int argc, char **argv)
 {
-	t_system sys;
+	t_system	sys;
+	int			fd;
 
 	if (argc == 1)
 		ft_exception("No map send", &sys);
@@ -77,12 +81,12 @@ int main(int argc, char **argv)
 	ft_init_system(&sys);
 	if (!sys.mlx_vars.mlx)
 		ft_exception("Mlx failed start", &sys);
-	if (!ft_isCubFile(argv[1]))
+	if (!ft_iscubfile(argv[1]))
 		ft_exception("Not .cub file selected", &sys);
-	int fd = open(argv[1], O_RDONLY);
+	fd = open(argv[1], O_RDONLY);
 	if (fd == -1)
 		ft_exception("Insert a valid .cub file", &sys);
-	ft_parseFileCub(fd, &sys);
+	ft_parse_cub(fd, &sys);
 	if (close(fd) == -1)
 		ft_exception("Can't close cub file", &sys);
 	if (argc == 3)

@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   control.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/12 23:27:44 by d2435             #+#    #+#             */
+/*   Updated: 2021/02/12 23:27:44 by d2435            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "cub3d.h"
 
-int ft_control_map_bis(t_system *sys, int x, int y)
+int		ft_control_map_bis(t_system *sys, int x, int y)
 {
 	if (x == 0 || y == 0 || y == sys->cub.map_H - 1 || x == sys->cub.map_W - 1)
 		return (0);
-	if (ft_isSpaceNear(sys->cub.map, x, y))
+	if (ft_isspacenear(sys->cub.map, x, y))
 		return (0);
 	if (ft_isalpha(sys->cub.map[y][x]))
 		ft_set_player_start(sys, x, y);
@@ -13,7 +25,7 @@ int ft_control_map_bis(t_system *sys, int x, int y)
 	return (1);
 }
 
-int ft_control_map(t_system *sys)
+int		ft_control_map(t_system *sys)
 {
 	int x;
 	int y;
@@ -24,8 +36,9 @@ int ft_control_map(t_system *sys)
 		x = 0;
 		while (x < sys->cub.map_W)
 		{
-			if (sys->cub.map[y][x] == '0' || sys->cub.map[y][x] == '2' || sys->cub.map[y][x] == 'W' ||
-				sys->cub.map[y][x] == 'N' || sys->cub.map[y][x] == 'S' || sys->cub.map[y][x] == 'E')
+			if (sys->cub.map[y][x] == '0' || sys->cub.map[y][x] == '2' ||
+				sys->cub.map[y][x] == 'W' || sys->cub.map[y][x] == 'N' ||
+				sys->cub.map[y][x] == 'S' || sys->cub.map[y][x] == 'E')
 				if (ft_control_map_bis(sys, x, y) == 0)
 					return (0);
 			x++;
@@ -39,31 +52,32 @@ int ft_control_map(t_system *sys)
 	return (1);
 }
 
-void ft_control_error_texture(t_system *sys)
+void	ft_control_error_texture(t_system *sys)
 {
 	if (sys->cub.txt_N.img == NULL)
 		ft_exception("North texture NULL", sys);
-	sys->cub.txt_N.addr = mlx_get_data_addr(sys->cub.txt_N.img, &sys->cub.txt_N.bpp,
-											&sys->cub.txt_N.line_len, &sys->cub.txt_N.endian);
+	sys->cub.txt_N.addr = mlx_get_data_addr(sys->cub.txt_N.img,
+		&sys->cub.txt_N.bpp, &sys->cub.txt_N.line_len, &sys->cub.txt_N.endian);
 	if (sys->cub.txt_S.img == NULL)
 		ft_exception("South texture NULL", sys);
-	sys->cub.txt_S.addr = mlx_get_data_addr(sys->cub.txt_S.img, &sys->cub.txt_S.bpp,
-											&sys->cub.txt_S.line_len, &sys->cub.txt_S.endian);
+	sys->cub.txt_S.addr = mlx_get_data_addr(sys->cub.txt_S.img,
+		&sys->cub.txt_S.bpp, &sys->cub.txt_S.line_len, &sys->cub.txt_S.endian);
 	if (sys->cub.txt_W.img == NULL)
 		ft_exception("West texture NULL", sys);
-	sys->cub.txt_W.addr = mlx_get_data_addr(sys->cub.txt_W.img, &sys->cub.txt_W.bpp,
-											&sys->cub.txt_W.line_len, &sys->cub.txt_W.endian);
+	sys->cub.txt_W.addr = mlx_get_data_addr(sys->cub.txt_W.img,
+		&sys->cub.txt_W.bpp, &sys->cub.txt_W.line_len, &sys->cub.txt_W.endian);
 	if (sys->cub.txt_E.img == NULL)
 		ft_exception("East texture NULL", sys);
-	sys->cub.txt_E.addr = mlx_get_data_addr(sys->cub.txt_E.img, &sys->cub.txt_E.bpp,
-											&sys->cub.txt_E.line_len, &sys->cub.txt_E.endian);
+	sys->cub.txt_E.addr = mlx_get_data_addr(sys->cub.txt_E.img,
+		&sys->cub.txt_E.bpp, &sys->cub.txt_E.line_len, &sys->cub.txt_E.endian);
 	if (sys->cub.txt_SPR.img == NULL)
 		ft_exception("Sprite texture NULL", sys);
-	sys->cub.txt_SPR.addr = mlx_get_data_addr(sys->cub.txt_SPR.img, &sys->cub.txt_SPR.bpp,
-											  &sys->cub.txt_SPR.line_len, &sys->cub.txt_SPR.endian);
+	sys->cub.txt_SPR.addr = mlx_get_data_addr(sys->cub.txt_SPR.img,
+		&sys->cub.txt_SPR.bpp, &sys->cub.txt_SPR.line_len,
+		&sys->cub.txt_SPR.endian);
 }
 
-void ft_control_error_resolution(t_system *sys)
+void	ft_control_error_resolution(t_system *sys)
 {
 	if (sys->cub.res_x <= 0)
 		ft_exception("Resolution X not valid", sys);
@@ -81,7 +95,7 @@ void ft_control_error_resolution(t_system *sys)
 	}
 }
 
-void ft_control_errors(t_system *sys)
+void	ft_control_errors(t_system *sys)
 {
 	int ret;
 
