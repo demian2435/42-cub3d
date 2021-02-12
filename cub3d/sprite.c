@@ -16,8 +16,8 @@ void ft_sprites_calc_dist(t_list **lst, t_system *sys)
 	while (start)
 	{
 		t_xy *s = (t_xy *)start->content;
-		s->_x = fabs(sys->player.pos_x) - fabs(s->x);
-		s->_y = fabs(sys->player.pos_x) - fabs(s->y);
+		s->_x = sys->player.pos_x - s->x;
+		s->_y = sys->player.pos_y - s->y;
 		s->dist = sqrt(s->_x * s->_x + s->_y * s->_y);
 		start = start->next;
 	}
