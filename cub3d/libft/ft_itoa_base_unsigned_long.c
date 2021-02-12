@@ -28,7 +28,7 @@ static char			*ft_itoa_base_unsigned_long_bis(size_t number, int base)
 		count++;
 	}
 	temp = number;
-	if (!(str = malloc((count + 1) * sizeof(char))))
+	if (!(str = (char *)malloc((count + 1) * sizeof(char))))
 		return (NULL);
 	str[count] = 0;
 	while (temp > 0)
@@ -47,7 +47,7 @@ char				*ft_itoa_base_unsigned_long(size_t number, int base)
 
 	if (number == 0)
 	{
-		if (!(str = malloc(2 * sizeof(char))))
+		if (!(str = (char *)malloc(2 * sizeof(char))))
 			return (NULL);
 		str[0] = '0';
 		str[1] = 0;

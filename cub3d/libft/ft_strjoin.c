@@ -19,7 +19,7 @@ char		*ft_strjoin(char const *s1, char const *s2)
 
 	if (!s1 || !s2)
 		return (NULL);
-	if ((p = malloc(ft_strlen(s1) + ft_strlen(s2) + 1)) == NULL)
+	if ((p = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1)) == NULL)
 		return (NULL);
 	str = p;
 	while (*s1)

@@ -67,17 +67,17 @@ void ft_control_error_resolution(t_system *sys)
 {
 	if (sys->cub.res_x <= 0)
 		ft_exception("Resolution X not valid", sys);
-	if (sys->cub.res_x > 1920)
+	if (sys->cub.res_x > sys->max_x)
 	{
-		ft_printf("Resize X resolution to 1920\n");
-		sys->cub.res_x = 1920;
+		ft_printf("Resize X resolution to %d\n", sys->max_x);
+		sys->cub.res_x = sys->max_x;
 	}
 	if (sys->cub.res_y <= 0)
 		ft_exception("Resolution Y not valid", sys);
-	if (sys->cub.res_y > 1080)
+	if (sys->cub.res_y > sys->max_y)
 	{
-		ft_printf("Resize Y resolution to 1080\n");
-		sys->cub.res_y = 1080;
+		ft_printf("Resize Y resolution to %d\n", sys->max_y);
+		sys->cub.res_y = sys->max_y;
 	}
 }
 

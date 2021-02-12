@@ -33,6 +33,7 @@ void ft_save_frame(t_system *sys)
 	}
 	if (close(fd) == -1)
 		ft_exception("Can't close bmp file", sys);
+	mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
 }
 
 void ft_write_on_file(t_system *sys, int fd, const void *buf, ssize_t len)

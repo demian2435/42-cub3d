@@ -19,7 +19,7 @@ char		*ft_strndup(const char *s, size_t n)
 	size_t	size;
 
 	size = n > ft_strlen(s) ? ft_strlen(s) : n;
-	if ((dup = malloc((size + 1) * sizeof(char))) == NULL)
+	if ((dup = (char *)malloc((size + 1) * sizeof(char))) == NULL)
 		return (NULL);
 	p = dup;
 	while (n && *s)

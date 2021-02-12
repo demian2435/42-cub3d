@@ -38,30 +38,30 @@ void ft_init_system(t_system *sys)
 	sys->cub.map_H = -1;
 	sys->player.pos_x = -1;
 	sys->player.pos_y = -1;
+	mlx_get_screen_size(sys->mlx_vars.mlx, &sys->max_x, &sys->max_y);
 }
 
 void ft_parseFileCub(int fd, t_system *sys)
 {
-	t_list *list_map;
 	t_list *list_map_temp;
 	int i;
 
-	list_map = ft_parseFileCub_bis(fd, sys);
-	list_map_temp = list_map;
-	sys->cub.map_H = ft_lstsize(list_map);
-	sys->cub.map_W = ft_mapmaxwidth(list_map);
+	ft_parseFileCub_bis(fd, sys);
+	list_map_temp = sys->parse.list_map;
+	sys->cub.map_H = ft_lstsize(list_map_temp);
+	sys->cub.map_W = ft_mapmaxwidth(list_map_temp);
 	if ((sys->cub.map = (char **)malloc((sys->cub.map_H + 1) * sizeof(char *))) == NULL)
 		ft_exception("Malloc fail during map creation (step 1)", sys);
 	i = 0;
-	while (list_map)
+	while (list_map_temp)
 	{
-		if ((sys->cub.map[i] = ft_strndupfill(list_map->content, sys->cub.map_W, ' ')) == NULL)
+		if ((sys->cub.map[i] = ft_strndupfill(list_map_temp->content, sys->cub.map_W, ' ')) == NULL)
 			ft_exception("Malloc fail during map creation (step 2)", sys);
-		list_map = list_map->next;
+		list_map_temp = list_map_temp->next;
 		i++;
 	}
 	sys->cub.map[i] = NULL;
-	ft_lstclear(&list_map_temp, free);
+	ft_lstclear(&sys->parse.list_map, free);
 	ft_control_errors(sys);
 }
 

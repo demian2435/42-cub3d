@@ -36,20 +36,10 @@ int ft_key_release(int keycode, t_system *sys)
 	return (0);
 }
 
-int ft_key_exit(t_system *sys)
+void ft_clean_struct(t_system *sys)
 {
 	int i;
 
-	if (sys->cub.txt_N.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_N.img);
-	if (sys->cub.txt_S.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_S.img);
-	if (sys->cub.txt_W.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_W.img);
-	if (sys->cub.txt_E.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_E.img);
-	if (sys->cub.txt_SPR.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_SPR.img);
 	if (sys->cub.map)
 	{
 		i = 0;
@@ -62,21 +52,27 @@ int ft_key_exit(t_system *sys)
 		ft_lstclear(&sys->cub.sprites, free);
 		free(sys->cub.sprites);
 	}
-	/* NO MAC
-	if (sys->mlx_vars.win)
-	{
-		mlx_destroy_window(sys->mlx_vars.mlx, sys->mlx_vars.win);
-		sys->mlx_vars.win = NULL;
-	}
-	*/
-	//if (sys->frame.img)
-	//mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);
+}
+
+int ft_key_exit(t_system *sys)
+{
+	if (sys->cub.txt_N.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_N.img);
+	if (sys->cub.txt_S.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_S.img);
+	if (sys->cub.txt_W.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_W.img);
+	if (sys->cub.txt_E.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_E.img);
+	if (sys->cub.txt_SPR.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_SPR.img);
+	ft_clean_struct(sys);
 	if (sys->mlx_vars.win)
 		free(sys->mlx_vars.win);
-	//NO MAC
-	//if (sys->mlx_vars.mlx)
-	//	mlx_destroy_display(sys->mlx_vars.mlx);
+	if (sys->mlx_vars.mlx)
+		mlx_destroy_display(sys->mlx_vars.mlx);
 	free(sys->mlx_vars.mlx);
-	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435\n* * * * * * * * * * * * * *\n Good bye my little friend\n* * * * * * * * * * * * * *\n");
+	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435\n* * * * * * * * * * * * * *");
+	ft_printf("\n Good bye my little friend\n* * * * * * * * * * * * * *\n");
 	exit(0);
 }

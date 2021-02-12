@@ -17,7 +17,7 @@ char		*ft_strndupfill(const char *s, size_t n, char fill)
 	char	*dup;
 	char	*p;
 
-	if ((dup = malloc((n + 1) * sizeof(char))) == NULL)
+	if ((dup = (char *)malloc((n + 1) * sizeof(char))) == NULL)
 		return (NULL);
 	p = dup;
 	while (n && *s)

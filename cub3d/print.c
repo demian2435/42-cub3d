@@ -10,5 +10,11 @@ void ft_print_pixel_exa(int x, int y, int color, t_system *sys)
 
 int ft_convert_color(int r, int g, int b)
 {
-	return ((r&0x0ff)<<16)|((g&0x0ff)<<8)|(b&0x0ff);
+	return ((r & 0x0ff) << 16) | ((g & 0x0ff) << 8) | (b & 0x0ff);
+}
+
+void ft_skip_spaces(t_system *sys)
+{
+	while (ft_isspace(*sys->parse.line))
+		sys->parse.line++;
 }

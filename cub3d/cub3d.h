@@ -117,6 +117,14 @@ typedef struct s_cub
 	int map_H;
 } t_cub;
 
+typedef struct s_parse
+{
+	char *line;
+	char *line_tmp;
+	int count;
+	t_list *list_map;
+} t_parse;
+
 typedef struct s_mlx_vars
 {
 	void *mlx;
@@ -136,6 +144,8 @@ typedef struct s_player
 	int move_y;
 	int move_x;
 	int move_r;
+	double new_x;
+	double new_y;
 } t_player;
 
 typedef struct s_system
@@ -145,7 +155,10 @@ typedef struct s_system
 	t_next_frame nf;
 	t_mlx_vars mlx_vars;
 	t_player player;
+	t_parse parse;
 	int save;
+	int max_y;
+	int max_x;
 } t_system;
 
 void ft_exception(char *str, t_system *sys);
@@ -176,8 +189,32 @@ int main(int argc, char **argv);
 void ft_init_system(t_system *sys);
 void ft_start_save(char *str, t_system *sys);
 int ft_convert_color(int r, int g, int b);
-
+void ft_rotate_left(t_system *sys);
+void ft_rotate_right(t_system *sys);
+void ft_move_right(t_system *sys);
+void ft_move_left(t_system *sys);
+void ft_move_up_down(t_system *sys);
 int ft_next_frame(t_system *sys);
+void ft_frame_1(t_system *sys);
+void ft_frame_2(t_system *sys);
+void ft_frame_3(t_system *sys);
+void ft_frame_4(t_system *sys);
+void ft_frame_5(t_system *sys);
+void ft_frame_6(t_system *sys);
+void ft_frame_7(t_system *sys);
+void ft_frame_8(t_system *sys);
+void ft_frame_9(t_system *sys);
+void ft_clean_struct(t_system *sys);
 int ft_key_exit(t_system *sys);
-t_list *ft_parseFileCub_bis(int fd, t_system *sys);
+void ft_parse_resolution(t_system *sys);
+void ft_parse_map(int fd, t_system *sys);
+void ft_parse_texture_N(t_system *sys);
+void ft_parse_texture_S(t_system *sys);
+void ft_parse_texture_W(t_system *sys);
+void ft_parse_texture_E(t_system *sys);
+void ft_parse_floor(t_system *sys);
+void ft_parse_ceiling(t_system *sys);
+void ft_skip_spaces(t_system *sys);
+void ft_parse_texture_spr(t_system *sys);
+void ft_parseFileCub_bis(int fd, t_system *sys);
 #endif

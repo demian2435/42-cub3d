@@ -20,7 +20,7 @@ static char		*ft_itoa_base_tris(int number, int base, char *arr, int count)
 	temp = (long int)number;
 	if (number < 0)
 		temp = temp * -1;
-	if (!(str = malloc((count + 1) * sizeof(char))))
+	if (!(str = (char *)malloc((count + 1) * sizeof(char))))
 		return (NULL);
 	str[count] = 0;
 	while (temp > 0)
@@ -62,7 +62,7 @@ char			*ft_itoa_base(int number, int base)
 
 	if (number == 0)
 	{
-		if (!(str = malloc(2 * sizeof(char))))
+		if (!(str = (char *)malloc(2 * sizeof(char))))
 			return (NULL);
 		str[0] = '0';
 		str[1] = 0;

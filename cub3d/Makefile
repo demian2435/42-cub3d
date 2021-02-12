@@ -11,15 +11,19 @@ OPT			=	-O3
 CFLAGS		=	-Wall -Wextra -Werror
 
 SRCS		=	main.c \
-				main_bis.c \
+				save.c \
 				control.c \
+				control_bis.c \
 				frame.c \
+				frame_bis.c \
 				parse.c \
+				parse_bis.c \
 				utils.c \
 				sprite.c \
 				keys.c \
 				player.c \
-				print.c
+				print.c \
+				move.c
 
 OBJS		=	${SRCS:.c=.o}
 

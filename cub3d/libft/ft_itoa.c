@@ -39,7 +39,7 @@ char			*ft_itoa(int n)
 	conversion = (long int)n;
 	negative = conversion < 0 ? -1 : 1;
 	count = ft_numberlen(conversion);
-	if ((p = malloc((count + 1) * sizeof(char))) == NULL)
+	if ((p = (char *)malloc((count + 1) * sizeof(char))) == NULL)
 		return (NULL);
 	conversion *= negative;
 	if (negative == -1)

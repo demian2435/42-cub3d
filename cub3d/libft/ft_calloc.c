@@ -16,8 +16,8 @@ void		*ft_calloc(size_t nelem, size_t elsize)
 {
 	char	*p;
 
-	if ((p = malloc(nelem * elsize)) == NULL)
+	if ((p = (char *)malloc(nelem * elsize)) == NULL)
 		return (NULL);
 	p = ft_memset(p, 0, nelem * elsize);
-	return (p);
+	return ((void *)p);
 }
