@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:26:11 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/12 23:26:16 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 14:15:54 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,17 @@ int		ft_ismap(char *str)
 	return (0);
 }
 
-int		ft_iscubfile(char *str)
+int		ft_istypefile(char *str, char *type, t_system *sys)
 {
 	int len;
+	int fd;
 
+	if ((fd = open(str, O_RDONLY)) == -1)
+		ft_exception("Can't open file", sys);
+	if (close(fd))
+		ft_exception("Can't close file", sys);
 	len = ft_strlen(str);
 	if (len <= 4)
 		return (0);
-	return (!ft_strcmp(str + (len - 4), ".cub"));
+	return (!ft_strcmp(str + (len - 4), type));
 }

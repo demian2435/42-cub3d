@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:09 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/12 23:27:10 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 14:15:16 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,17 @@ void	ft_parse_texture_n(t_system *sys)
 	if (sys->parse.line[0] == 'N' && sys->parse.line[1] == 'O' &&
 		ft_isspace(sys->parse.line[2]) && !sys->parse.find)
 	{
-		if (sys->cub.txt_N.img != NULL)
+		if (sys->cub.txt_n.img != NULL)
 			ft_exception("Duplicated north texture", sys);
 		sys->parse.line += 2;
-		ft_skip_spaces(sys);
-		sys->cub.txt_N.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-			sys->parse.line, &sys->cub.txt_N.width, &sys->cub.txt_N.height);
+		sys->parse.line = ft_strtrim(sys->parse.line, " \t\f\r\v");
+		if (ft_istypefile(sys->parse.line, ".xpm", sys))
+			sys->cub.txt_n.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				sys->parse.line, &sys->cub.txt_n.width, &sys->cub.txt_n.height);
+		else if (ft_istypefile(sys->parse.line, ".png", sys))
+			sys->cub.txt_n.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				"../textures/cave.xpm", &sys->cub.txt_n.width,
+				&sys->cub.txt_n.height);
 		sys->parse.find = 1;
 	}
 }
@@ -32,12 +37,17 @@ void	ft_parse_texture_s(t_system *sys)
 	if (sys->parse.line[0] == 'S' && sys->parse.line[1] == 'O' &&
 		ft_isspace(sys->parse.line[2]) && !sys->parse.find)
 	{
-		if (sys->cub.txt_S.img != NULL)
+		if (sys->cub.txt_s.img != NULL)
 			ft_exception("Duplicated south texture", sys);
 		sys->parse.line += 2;
-		ft_skip_spaces(sys);
-		sys->cub.txt_S.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-			sys->parse.line, &sys->cub.txt_S.width, &sys->cub.txt_S.height);
+		sys->parse.line = ft_strtrim(sys->parse.line, " \t\f\r\v");
+		if (ft_istypefile(sys->parse.line, ".xpm", sys))
+			sys->cub.txt_s.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				sys->parse.line, &sys->cub.txt_s.width, &sys->cub.txt_s.height);
+		else if (ft_istypefile(sys->parse.line, ".png", sys))
+			sys->cub.txt_s.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				"../textures/cave.xpm", &sys->cub.txt_n.width,
+				&sys->cub.txt_n.height);
 		sys->parse.find = 1;
 	}
 }
@@ -47,12 +57,17 @@ void	ft_parse_texture_w(t_system *sys)
 	if (sys->parse.line[0] == 'W' && sys->parse.line[1] == 'E' &&
 		ft_isspace(sys->parse.line[2]) && !sys->parse.find)
 	{
-		if (sys->cub.txt_W.img != NULL)
+		if (sys->cub.txt_w.img != NULL)
 			ft_exception("Duplicated west texture", sys);
 		sys->parse.line += 2;
-		ft_skip_spaces(sys);
-		sys->cub.txt_W.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-			sys->parse.line, &sys->cub.txt_W.width, &sys->cub.txt_W.height);
+		sys->parse.line = ft_strtrim(sys->parse.line, " \t\f\r\v");
+		if (ft_istypefile(sys->parse.line, ".xpm", sys))
+			sys->cub.txt_w.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				sys->parse.line, &sys->cub.txt_w.width, &sys->cub.txt_w.height);
+		else if (ft_istypefile(sys->parse.line, ".png", sys))
+			sys->cub.txt_w.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				"../textures/cave.xpm", &sys->cub.txt_n.width,
+				&sys->cub.txt_n.height);
 		sys->parse.find = 1;
 	}
 }
@@ -62,12 +77,17 @@ void	ft_parse_texture_e(t_system *sys)
 	if (sys->parse.line[0] == 'E' && sys->parse.line[1] == 'A' &&
 		ft_isspace(sys->parse.line[2]) && !sys->parse.find)
 	{
-		if (sys->cub.txt_E.img != NULL)
+		if (sys->cub.txt_e.img != NULL)
 			ft_exception("Duplicated east texture", sys);
 		sys->parse.line += 2;
-		ft_skip_spaces(sys);
-		sys->cub.txt_E.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-			sys->parse.line, &sys->cub.txt_E.width, &sys->cub.txt_E.height);
+		sys->parse.line = ft_strtrim(sys->parse.line, " \t\f\r\v");
+		if (ft_istypefile(sys->parse.line, ".xpm", sys))
+			sys->cub.txt_e.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				sys->parse.line, &sys->cub.txt_e.width, &sys->cub.txt_e.height);
+		else if (ft_istypefile(sys->parse.line, ".png", sys))
+			sys->cub.txt_e.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				"../textures/cave.xpm", &sys->cub.txt_n.width,
+				&sys->cub.txt_n.height);
 		sys->parse.find = 1;
 	}
 }
@@ -77,12 +97,18 @@ void	ft_parse_texture_spr(t_system *sys)
 	if (sys->parse.line[0] == 'S' && ft_isspace(sys->parse.line[1]) &&
 		!sys->parse.find)
 	{
-		if (sys->cub.txt_SPR.img != NULL)
+		if (sys->cub.txt_spr.img != NULL)
 			ft_exception("Duplicated sprite texture", sys);
 		sys->parse.line++;
-		ft_skip_spaces(sys);
-		sys->cub.txt_SPR.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-			sys->parse.line, &sys->cub.txt_SPR.width, &sys->cub.txt_SPR.height);
+		sys->parse.line = ft_strtrim(sys->parse.line, " \t\f\r\v");
+		if (ft_istypefile(sys->parse.line, ".xpm", sys))
+			sys->cub.txt_spr.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				sys->parse.line, &sys->cub.txt_spr.width,
+				&sys->cub.txt_spr.height);
+		else if (ft_istypefile(sys->parse.line, ".png", sys))
+			sys->cub.txt_spr.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
+				"../textures/cave.xpm", &sys->cub.txt_n.width,
+				&sys->cub.txt_n.height);
 		sys->parse.find = 1;
 	}
 }

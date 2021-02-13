@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:26:29 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/12 23:26:31 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 10:00:39 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ void	ft_sprites_calc_dist(t_list **lst, t_system *sys)
 	while (start)
 	{
 		s = (t_xy *)start->content;
-		s->_x = sys->player.pos_x - s->x;
-		s->_y = sys->player.pos_y - s->y;
-		s->dist = sqrt(s->_x * s->_x + s->_y * s->_y);
+		s->t_x = sys->player.pos_x - s->x;
+		s->t_y = sys->player.pos_y - s->y;
+		s->dist = sqrt(s->t_x * s->t_x + s->t_y * s->t_y);
 		start = start->next;
 	}
 }

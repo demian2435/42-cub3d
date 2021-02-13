@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:23 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/12 23:27:24 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 10:13:52 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,16 +70,16 @@ void	ft_clean_struct(t_system *sys)
 
 int		ft_key_exit(t_system *sys)
 {
-	if (sys->cub.txt_N.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_N.img);
-	if (sys->cub.txt_S.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_S.img);
-	if (sys->cub.txt_W.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_W.img);
-	if (sys->cub.txt_E.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_E.img);
-	if (sys->cub.txt_SPR.img)
-		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_SPR.img);
+	if (sys->cub.txt_n.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_n.img);
+	if (sys->cub.txt_s.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_s.img);
+	if (sys->cub.txt_w.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_w.img);
+	if (sys->cub.txt_e.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_e.img);
+	if (sys->cub.txt_spr.img)
+		mlx_destroy_image(sys->mlx_vars.mlx, sys->cub.txt_spr.img);
 	ft_clean_struct(sys);
 	if (sys->mlx_vars.win)
 		free(sys->mlx_vars.win);

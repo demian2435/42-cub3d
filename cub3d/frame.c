@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:28 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/12 23:27:28 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 10:14:09 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 void	ft_frame_4(t_system *sys)
 {
-	sys->nf.wallDist = 0;
+	sys->nf.walldist = 0;
 	if (sys->nf.side == 0)
-		sys->nf.wallDist = (sys->nf.mapX - sys->player.pos_x +
-			(1 - sys->nf.stepX) / 2) / sys->nf.rayX;
+		sys->nf.walldist = (sys->nf.mapx - sys->player.pos_x +
+			(1 - sys->nf.stepx) / 2) / sys->nf.rayx;
 	else if (sys->nf.side == 1)
-		sys->nf.wallDist = (sys->nf.mapY - sys->player.pos_y +
-			(1 - sys->nf.stepY) / 2) / sys->nf.rayY;
-	sys->nf.line_h = (int)(sys->cub.res_y / sys->nf.wallDist);
+		sys->nf.walldist = (sys->nf.mapy - sys->player.pos_y +
+			(1 - sys->nf.stepy) / 2) / sys->nf.rayy;
+	sys->nf.line_h = (int)(sys->cub.res_y / sys->nf.walldist);
 	sys->nf.d_start = (int)(-sys->nf.line_h / 2 + sys->cub.res_y / 2);
 	sys->nf.d_start = sys->nf.d_start < 0 ? 0 : sys->nf.d_start;
 	sys->nf.d_start = sys->nf.d_start > sys->cub.res_y ?
@@ -31,83 +31,83 @@ void	ft_frame_4(t_system *sys)
 		sys->cub.res_y : sys->nf.d_end;
 	sys->nf.d_end = sys->nf.d_end < 0 ? 0 : sys->nf.d_end;
 	if (sys->nf.side == 0)
-		sys->nf.wallX = sys->player.pos_y + sys->nf.wallDist * sys->nf.rayY;
+		sys->nf.wallx = sys->player.pos_y + sys->nf.walldist * sys->nf.rayy;
 	else
-		sys->nf.wallX = sys->player.pos_x + sys->nf.wallDist * sys->nf.rayX;
-	sys->nf.wallX -= (int)sys->nf.wallX;
+		sys->nf.wallx = sys->player.pos_x + sys->nf.walldist * sys->nf.rayx;
+	sys->nf.wallx -= (int)sys->nf.wallx;
 	sys->nf.y = 0;
 }
 
 void	ft_frame_3(t_system *sys)
 {
-	if (sys->nf.sideX < sys->nf.sideY)
+	if (sys->nf.sidex < sys->nf.sidey)
 	{
-		sys->nf.sideX += sys->nf.deltaX;
-		sys->nf.mapX += sys->nf.stepX;
+		sys->nf.sidex += sys->nf.deltax;
+		sys->nf.mapx += sys->nf.stepx;
 		sys->nf.side = 0;
 	}
 	else
 	{
-		sys->nf.sideY += sys->nf.deltaY;
-		sys->nf.mapY += sys->nf.stepY;
+		sys->nf.sidey += sys->nf.deltay;
+		sys->nf.mapy += sys->nf.stepy;
 		sys->nf.side = 1;
 	}
-	if (((sys->nf.mapX < 0 && sys->nf.stepX < 0) ||
-		(sys->nf.mapY < 0 && sys->nf.stepY < 0) ||
-		((sys->nf.mapX >= sys->cub.map_W) && sys->nf.stepX >= 0) ||
-		((sys->nf.mapY >= sys->cub.map_H) && sys->nf.stepY >= 0)))
+	if (((sys->nf.mapx < 0 && sys->nf.stepx < 0) ||
+		(sys->nf.mapy < 0 && sys->nf.stepy < 0) ||
+		((sys->nf.mapx >= sys->cub.map_w) && sys->nf.stepx >= 0) ||
+		((sys->nf.mapy >= sys->cub.map_h) && sys->nf.stepy >= 0)))
 		sys->nf.hit = 1;
-	else if (sys->nf.mapX >= 0 && sys->nf.mapY >= 0 &&
-		sys->nf.mapX < sys->cub.map_W &&
-		sys->nf.mapY < sys->cub.map_H)
+	else if (sys->nf.mapx >= 0 && sys->nf.mapy >= 0 &&
+		sys->nf.mapx < sys->cub.map_w &&
+		sys->nf.mapy < sys->cub.map_h)
 	{
-		if (sys->cub.map[sys->nf.mapY][sys->nf.mapX] == '1')
+		if (sys->cub.map[sys->nf.mapy][sys->nf.mapx] == '1')
 			sys->nf.hit = 1;
 	}
 }
 
 void	ft_frame_2(t_system *sys)
 {
-	if (sys->nf.rayX < 0)
+	if (sys->nf.rayx < 0)
 	{
-		sys->nf.stepX = -1;
-		sys->nf.sideX = (sys->player.pos_x - sys->nf.mapX) * sys->nf.deltaX;
+		sys->nf.stepx = -1;
+		sys->nf.sidex = (sys->player.pos_x - sys->nf.mapx) * sys->nf.deltax;
 	}
 	else
 	{
-		sys->nf.stepX = 1;
-		sys->nf.sideX = (sys->nf.mapX + 1.0 - sys->player.pos_x) *
-			sys->nf.deltaX;
+		sys->nf.stepx = 1;
+		sys->nf.sidex = (sys->nf.mapx + 1.0 - sys->player.pos_x) *
+			sys->nf.deltax;
 	}
-	if (sys->nf.rayY < 0)
+	if (sys->nf.rayy < 0)
 	{
-		sys->nf.stepY = -1;
-		sys->nf.sideY = (sys->player.pos_y - sys->nf.mapY) * sys->nf.deltaY;
+		sys->nf.stepy = -1;
+		sys->nf.sidey = (sys->player.pos_y - sys->nf.mapy) * sys->nf.deltay;
 	}
 	else
 	{
-		sys->nf.stepY = 1;
-		sys->nf.sideY = (sys->nf.mapY + 1.0 - sys->player.pos_y) *
-			sys->nf.deltaY;
+		sys->nf.stepy = 1;
+		sys->nf.sidey = (sys->nf.mapy + 1.0 - sys->player.pos_y) *
+			sys->nf.deltay;
 	}
 	sys->nf.hit = 0;
 }
 
 void	ft_frame_1(t_system *sys)
 {
-	sys->nf.cameraX = 2 * sys->nf.x / (double)sys->cub.res_x - 1;
-	sys->nf.rayX = sys->player.dir_x + sys->player.plane_x * sys->nf.cameraX;
-	sys->nf.rayY = sys->player.dir_y + sys->player.plane_y * sys->nf.cameraX;
+	sys->nf.cam_x = 2 * sys->nf.x / (double)sys->cub.res_x - 1;
+	sys->nf.rayx = sys->player.dir_x + sys->player.plane_x * sys->nf.cam_x;
+	sys->nf.rayy = sys->player.dir_y + sys->player.plane_y * sys->nf.cam_x;
 	if (sys->player.pos_x < 0)
-		sys->nf.mapX = (-1) + (int)sys->player.pos_x;
+		sys->nf.mapx = (-1) + (int)sys->player.pos_x;
 	else
-		sys->nf.mapX = (int)sys->player.pos_x;
+		sys->nf.mapx = (int)sys->player.pos_x;
 	if (sys->player.pos_y < 0)
-		sys->nf.mapY = (-1) + (int)sys->player.pos_y;
+		sys->nf.mapy = (-1) + (int)sys->player.pos_y;
 	else
-		sys->nf.mapY = (int)sys->player.pos_y;
-	sys->nf.deltaX = fabs(1 / sys->nf.rayX);
-	sys->nf.deltaY = fabs(1 / sys->nf.rayY);
+		sys->nf.mapy = (int)sys->player.pos_y;
+	sys->nf.deltax = fabs(1 / sys->nf.rayx);
+	sys->nf.deltay = fabs(1 / sys->nf.rayy);
 }
 
 int		ft_next_frame(t_system *sys)

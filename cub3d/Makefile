@@ -12,7 +12,7 @@
 
 OS			=	$(shell uname)
 
-NAME		=	Cub3D
+NAME		=	cub3D
 
 MAP			=	./maps/map.cub
 

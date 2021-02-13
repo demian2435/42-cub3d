@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
+/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 18:38:52 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/11 19:22:34 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/13 13:14:42 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ void	ft_init_system(t_system *sys)
 	sys->cub.c_rgb[0] = -1;
 	sys->cub.c_rgb[1] = -1;
 	sys->cub.c_rgb[2] = -1;
-	sys->cub.map_W = -1;
-	sys->cub.map_H = -1;
+	sys->cub.map_w = -1;
+	sys->cub.map_h = -1;
 	sys->player.pos_x = -1;
 	sys->player.pos_y = -1;
 	mlx_get_screen_size(sys->mlx_vars.mlx, &sys->max_x, &sys->max_y);
@@ -49,16 +49,16 @@ void	ft_parse_cub(int fd, t_system *sys)
 
 	ft_parse_cub_bis(fd, sys);
 	list_map_temp = sys->parse.list_map;
-	sys->cub.map_H = ft_lstsize(list_map_temp);
-	sys->cub.map_W = ft_mapmaxwidth(list_map_temp);
-	if ((sys->cub.map = (char **)malloc((sys->cub.map_H + 1) *
+	sys->cub.map_h = ft_lstsize(list_map_temp);
+	sys->cub.map_w = ft_mapmaxwidth(list_map_temp);
+	if ((sys->cub.map = (char **)malloc((sys->cub.map_h + 1) *
 		sizeof(char *))) == NULL)
 		ft_exception("Malloc fail during map creation (step 1)", sys);
 	i = 0;
 	while (list_map_temp)
 	{
 		if ((sys->cub.map[i] = ft_strndupfill(list_map_temp->content,
-			sys->cub.map_W, ' ')) == NULL)
+			sys->cub.map_w, ' ')) == NULL)
 			ft_exception("Malloc fail during map creation (step 2)", sys);
 		list_map_temp = list_map_temp->next;
 		i++;
@@ -81,7 +81,7 @@ int		main(int argc, char **argv)
 	ft_init_system(&sys);
 	if (!sys.mlx_vars.mlx)
 		ft_exception("Mlx failed start", &sys);
-	if (!ft_iscubfile(argv[1]))
+	if (!ft_istypefile(argv[1], ".cub", &sys))
 		ft_exception("Not .cub file selected", &sys);
 	fd = open(argv[1], O_RDONLY);
 	if (fd == -1)
