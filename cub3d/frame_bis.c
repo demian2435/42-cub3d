@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:32 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 10:13:52 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 15:21:06 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 void	ft_frame_9(t_system *sys)
 {
-	ft_rotate_left(sys);
-	ft_rotate_right(sys);
-	ft_move_left(sys);
-	ft_move_right(sys);
-	ft_move_up_down(sys);
 	if (sys->save == 0)
 	{
+		ft_rotate_left(sys);
+		ft_rotate_right(sys);
+		ft_move_left(sys);
+		ft_move_right(sys);
+		ft_move_up_down(sys);
 		mlx_put_image_to_window(sys->mlx_vars.mlx,
 			sys->mlx_vars.win, sys->frame.img, 0, 0);
 		mlx_destroy_image(sys->mlx_vars.mlx, sys->frame.img);

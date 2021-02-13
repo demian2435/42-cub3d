@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:39 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 13:50:27 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 15:13:33 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ int					ft_key_release(int keycode, t_system *sys);
 void				ft_sprites_calc_dist(t_list **lst, t_system *sys);
 void				ft_sprites_sort(t_list **lst);
 void				ft_start_game(t_system *sys);
-int					ft_istypefile(char *str, char *type, t_system *sys);
+int					ft_istypefile(char *str, char *type);
 void				ft_write_on_file(t_system *sys, int fd, const void *buf,
 						ssize_t len);
 void				ft_init_bpm(t_system *sys, t_bmp *bmp);

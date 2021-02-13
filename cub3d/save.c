@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:26:40 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 11:09:39 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 15:26:41 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	ft_save_frame(t_system *sys)
 	ft_next_frame(sys);
 	ft_memset(&bmp, 0, sizeof(t_bmp));
 	ft_init_bpm(sys, &bmp);
-	fd = open("screenshot.bmp", O_CREAT | O_WRONLY | O_TRUNC);
+	fd = open("screenshot.bmp", O_CREAT | O_WRONLY | O_TRUNC, 0666);
 	if (fd < 0)
 		ft_exception("Can't open/create screenshot file", sys);
 	ft_write_on_file(sys, fd, "BM", 2);

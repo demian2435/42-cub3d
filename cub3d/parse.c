@@ -6,7 +6,7 @@
 /*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:04 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 14:15:03 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/13 15:48:21 by d2435            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,10 @@ void	ft_parse_resolution(t_system *sys)
 		ft_skip_digit(sys);
 		ft_skip_spaces(sys);
 		sys->cub.res_y = ft_atoi(sys->parse.line);
-		if (sys->cub.res_y == -1)
+		if (sys->cub.res_y < 100)
 			ft_exception("Resolution y wrong", sys);
-		if (sys->cub.res_y < 25)
-			sys->cub.res_y = 25;
+		if (sys->cub.res_x <= sys->cub.res_y)
+			ft_exception("Wrong ratio resolution", sys);
 		ft_skip_digit(sys);
 		if (ft_skip_spaces(sys) && ft_strlen(sys->parse.line) == 0)
 			sys->parse.find = 1;
