@@ -1,5 +1,5 @@
 
-R 1200 800
+R 1280 800
 			NO 		./textures/lodovico.xpm  
 SO ./textures/einstein.xpm
 WE ./textures/elon.xpm

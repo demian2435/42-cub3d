@@ -6,7 +6,7 @@
 /*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:32 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/14 10:46:57 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/14 11:21:18 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	ft_frame_7(t_system *sys)
 
 void	ft_frame_6(t_system *sys)
 {
-	while (sys->nf.d_start <= sys->nf.d_end)
+	while (sys->nf.d_start < sys->nf.d_end)
 	{
 		sys->nf.t_x = (int)fabs(sys->nf.tex_x);
 		sys->nf.t_y = (int)fabs(sys->nf.tex_y);
