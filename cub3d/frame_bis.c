@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   frame_bis.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:32 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 15:21:06 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/14 10:32:06 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	ft_frame_8(t_system *sys)
 			sys->nf.col = (*(int *)(sys->cub.txt_spr.addr +
 				((sys->nf.texy + (sys->nf.texx * sys->cub.txt_spr.width)) *
 				(sys->cub.txt_spr.bpp / 8))));
-			if ((unsigned int)sys->nf.col != 4278255360)
+			if (((unsigned int)sys->nf.col & 0x00FF0000) != 0)
 				ft_print_pixel_exa(sys->nf.x, sys->nf.s_starty,
 					sys->nf.col, sys);
 			sys->nf.s_starty++;
@@ -113,13 +113,13 @@ void	ft_frame_5(t_system *sys)
 		ft_print_pixel_exa(sys->nf.x, sys->nf.y++, sys->nf.col, sys);
 	}
 	if (sys->nf.side == 0 && sys->nf.rayx < 0)
-		sys->nf.texture = sys->cub.txt_e;
-	else if (sys->nf.side == 0)
 		sys->nf.texture = sys->cub.txt_w;
+	else if (sys->nf.side == 0)
+		sys->nf.texture = sys->cub.txt_e;
 	else if (sys->nf.side == 1 && sys->nf.rayy < 0)
-		sys->nf.texture = sys->cub.txt_s;
-	else
 		sys->nf.texture = sys->cub.txt_n;
+	else
+		sys->nf.texture = sys->cub.txt_s;
 	sys->nf.wallstep = 1.0 * sys->nf.texture.width / sys->nf.line_h;
 	sys->nf.tex_y = (sys->nf.d_start - sys->cub.res_y / 2 +
 		sys->nf.line_h / 2) * sys->nf.wallstep;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   keys.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:23 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 10:13:52 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/14 10:33:58 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,6 @@ int		ft_key_exit(t_system *sys)
 	ft_clean_struct(sys);
 	if (sys->mlx_vars.win)
 		free(sys->mlx_vars.win);
-	if (sys->mlx_vars.mlx)
-		mlx_destroy_display(sys->mlx_vars.mlx);
 	free(sys->mlx_vars.mlx);
 	ft_printf("\n* * * * * * * * * * * * * *\n          by D2435");
 	ft_printf("\n* * * * * * * * * * * * * *");

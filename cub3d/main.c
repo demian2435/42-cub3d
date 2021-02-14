@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/01 18:38:52 by dmalori           #+#    #+#             */
-/*   Updated: 2021/02/13 15:13:07 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/14 10:38:03 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	ft_start_game(t_system *sys)
 	mlx_do_key_autorepeaton(sys->mlx_vars.mlx);
 	mlx_hook(sys->mlx_vars.win, 2, 0x1, ft_key_press, sys);
 	mlx_hook(sys->mlx_vars.win, 3, 0x2, ft_key_release, sys);
-	mlx_hook(sys->mlx_vars.win, 33, (1L << 17), ft_key_exit, sys);
+	mlx_hook(sys->mlx_vars.win, 17, 0, ft_key_exit, sys);
 	mlx_loop_hook(sys->mlx_vars.mlx, ft_next_frame, sys);
 	mlx_loop(sys->mlx_vars.mlx);
 }
@@ -39,7 +39,8 @@ void	ft_init_system(t_system *sys)
 	sys->cub.map_h = -1;
 	sys->player.pos_x = -1;
 	sys->player.pos_y = -1;
-	mlx_get_screen_size(sys->mlx_vars.mlx, &sys->max_x, &sys->max_y);
+	sys->max_x = 2560;
+	sys->max_y = 1600;
 }
 
 void	ft_parse_cub(int fd, t_system *sys)
@@ -81,7 +82,7 @@ int		main(int argc, char **argv)
 	ft_init_system(&sys);
 	if (!sys.mlx_vars.mlx)
 		ft_exception("Mlx failed start", &sys);
-	if (!ft_istypefile(argv[1], ".cub", &sys))
+	if (!ft_istypefile(argv[1], ".cub"))
 		ft_exception("Not .cub file selected", &sys);
 	fd = open(argv[1], O_RDONLY);
 	if (fd == -1)

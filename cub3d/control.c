@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   control.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:44 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 10:14:09 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/14 10:05:44 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,6 @@ void	ft_control_errors(t_system *sys)
 {
 	int ret;
 
-	ft_control_error_resolution(sys);
 	ft_control_error_texture(sys);
 	if (sys->cub.f_rgb[0] < 0 || sys->cub.f_rgb[0] > 255 ||
 		sys->cub.f_rgb[1] < 0 || sys->cub.f_rgb[1] > 255 ||

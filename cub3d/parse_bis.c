@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_bis.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: d2435 <d2435@student.42.fr>                +#+  +:+       +#+        */
+/*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:09 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/13 15:13:55 by d2435            ###   ########.fr       */
+/*   Updated: 2021/02/14 10:29:40 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,7 @@ void	ft_parse_texture_n(t_system *sys)
 			sys->cub.txt_n.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
 				tmp, &sys->cub.txt_n.width, &sys->cub.txt_n.height);
 		else if (ft_istypefile(tmp, ".png"))
-			sys->cub.txt_n.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-				"../textures/cave.xpm", &sys->cub.txt_n.width,
-				&sys->cub.txt_n.height);
+			ft_exception("Can't open png", sys);
 		free(tmp);
 		sys->parse.find = 1;
 	}
@@ -50,9 +48,7 @@ void	ft_parse_texture_s(t_system *sys)
 			sys->cub.txt_s.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
 				tmp, &sys->cub.txt_s.width, &sys->cub.txt_s.height);
 		else if (ft_istypefile(tmp, ".png"))
-			sys->cub.txt_s.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-				"../textures/cave.xpm", &sys->cub.txt_n.width,
-				&sys->cub.txt_n.height);
+			ft_exception("Can't open png", sys);
 		free(tmp);
 		sys->parse.find = 1;
 	}
@@ -73,9 +69,7 @@ void	ft_parse_texture_w(t_system *sys)
 			sys->cub.txt_w.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
 				tmp, &sys->cub.txt_w.width, &sys->cub.txt_w.height);
 		else if (ft_istypefile(tmp, ".png"))
-			sys->cub.txt_w.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-				"../textures/cave.xpm", &sys->cub.txt_n.width,
-				&sys->cub.txt_n.height);
+			ft_exception("Can't open png", sys);
 		free(tmp);
 		sys->parse.find = 1;
 	}
@@ -96,9 +90,7 @@ void	ft_parse_texture_e(t_system *sys)
 			sys->cub.txt_e.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
 				tmp, &sys->cub.txt_e.width, &sys->cub.txt_e.height);
 		else if (ft_istypefile(tmp, ".png"))
-			sys->cub.txt_e.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-				"../textures/cave.xpm", &sys->cub.txt_n.width,
-				&sys->cub.txt_n.height);
+			ft_exception("Can't open png", sys);
 		free(tmp);
 		sys->parse.find = 1;
 	}
@@ -120,9 +112,7 @@ void	ft_parse_texture_spr(t_system *sys)
 				tmp, &sys->cub.txt_spr.width,
 				&sys->cub.txt_spr.height);
 		else if (ft_istypefile(tmp, ".png"))
-			sys->cub.txt_spr.img = mlx_xpm_file_to_image(sys->mlx_vars.mlx,
-				"../textures/cave.xpm", &sys->cub.txt_n.width,
-				&sys->cub.txt_n.height);
+			ft_exception("Can't open png", sys);
 		free(tmp);
 		sys->parse.find = 1;
 	}
