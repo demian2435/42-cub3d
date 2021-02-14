@@ -6,7 +6,7 @@
 /*   By: dmalori <dmalori@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/12 23:27:32 by d2435             #+#    #+#             */
-/*   Updated: 2021/02/14 10:32:06 by dmalori          ###   ########.fr       */
+/*   Updated: 2021/02/14 10:46:57 by dmalori          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	ft_frame_8(t_system *sys)
 			sys->nf.col = (*(int *)(sys->cub.txt_spr.addr +
 				((sys->nf.texy + (sys->nf.texx * sys->cub.txt_spr.width)) *
 				(sys->cub.txt_spr.bpp / 8))));
-			if (((unsigned int)sys->nf.col & 0x00FF0000) != 0)
+			if (sys->nf.col != 0x00FF00)
 				ft_print_pixel_exa(sys->nf.x, sys->nf.s_starty,
 					sys->nf.col, sys);
 			sys->nf.s_starty++;
