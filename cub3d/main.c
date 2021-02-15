@@ -74,10 +74,11 @@ int		main(int argc, char **argv)
 	t_system	sys;
 	int			fd;
 
-	if (argc == 1)
-		ft_exception("No map send", &sys);
-	else if (argc > 3)
-		ft_exception("Too many arguments", &sys);
+	if (argc == 1 || argc > 3)
+	{
+		ft_printf("Error\nWrong number arguments\n");
+		exit(0);
+	}
 	ft_memset(&sys, 0, sizeof(t_system));
 	ft_init_system(&sys);
 	if (!sys.mlx_vars.mlx)
